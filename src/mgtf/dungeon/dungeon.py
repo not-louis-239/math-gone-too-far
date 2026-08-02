@@ -17,9 +17,20 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from typing import overload
+
 from mgtf.dungeon.tile import Tile, TileType
 
 
 class Dungeon:
     def __init__(self, width: int, height: int) -> None:
         self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(height)]
+
+    @overload
+    def __getitem__(self, key: int) -> list[Tile]: ...
+    @overload
+    def __getitem__(self, key: tuple[int, int]) -> Tile: ...
+    def __getitem__(self, key: int | tuple[int, int]) -> list[Tile] | Tile:
+        if isinstance(key, int):
+            return self.tiles[key]
+        return self.tiles[key[1]][key[0]]
