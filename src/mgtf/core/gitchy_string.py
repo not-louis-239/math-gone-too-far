@@ -17,18 +17,35 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.core.custom_types import Colour, AColour
+import random
 
 
-BG: Colour = (5, 5, 10)
-BG_PANEL: AColour = (0, 0, 0, 150)
+GLITCH_CHARS = "!@#$%&?£¢§Ø"
 
-FG: Colour = (190, 190, 255)
-FG_HEADER: Colour = (130, 130, 200)
-FG_BORDER: Colour = (208, 208, 255)
 
-BG_BUTTON_HOVER: Colour = (12, 12, 24)
-FG_BUTTON_HOVER: Colour = (14, 204, 128)
+class GlitchyString(str):
+    def __init__(self, value: str) -> None:
+        self._true_value = value
 
-FG_ERROR: Colour = (255, 108, 108)
-FG_WIN: Colour = (255, 210, 0)
+    def __repr__(self) -> str:
+        return f"GlitchyString({self._true_value!r})"
+
+    def __str__(self) -> str:
+        return "".join(random.choice(GLITCH_CHARS) for _ in self._true_value)
+
+
+def _test():
+    import time
+
+    gs = GlitchyString('Error')
+    print(f"Repr: {gs!r}")
+
+    for _ in range(200):  # 2 seconds simulated
+        print(f"\rStr:  {gs}", end='')
+        time.sleep(0.01)
+
+    print()
+
+
+if __name__ == "__main__":
+    _test()

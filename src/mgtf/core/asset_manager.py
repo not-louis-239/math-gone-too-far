@@ -17,18 +17,35 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.core.custom_types import Colour, AColour
+import pygame as pg
+
+from mgtf.core.paths import FONTS_DIR
 
 
-BG: Colour = (5, 5, 10)
-BG_PANEL: AColour = (0, 0, 0, 150)
+class Fonts:
+    def __init__(self) -> None:
+        self.base_font_path = FONTS_DIR / "RobotoMono-Regular.ttf"
 
-FG: Colour = (190, 190, 255)
-FG_HEADER: Colour = (130, 130, 200)
-FG_BORDER: Colour = (208, 208, 255)
+        self.title = pg.font.Font(self.base_font_path, 50)
+        self.header = pg.font.Font(self.base_font_path, 36)
+        self.text = pg.font.Font(self.base_font_path, 28)
 
-BG_BUTTON_HOVER: Colour = (12, 12, 24)
-FG_BUTTON_HOVER: Colour = (14, 204, 128)
+        self.button = pg.font.Font(self.base_font_path, 36)
+        self.small = pg.font.Font(self.base_font_path, 16)
 
-FG_ERROR: Colour = (255, 108, 108)
-FG_WIN: Colour = (255, 210, 0)
+
+class Images:
+    def __init__(self) -> None:
+        pass
+
+
+class Sounds:
+    def __init__(self) -> None:
+        pass
+
+
+class Assets:
+    def __init__(self) -> None:
+        self.fonts = Fonts()
+        self.images = Images()
+        self.sounds = Sounds()

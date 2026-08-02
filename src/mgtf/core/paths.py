@@ -17,18 +17,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.core.custom_types import Colour, AColour
+from pathlib import Path
 
 
-BG: Colour = (5, 5, 10)
-BG_PANEL: AColour = (0, 0, 0, 150)
+try:
+    ROOT_DIR = next(p for p in Path(__file__).resolve().parents if (p / ".git").exists())
+except StopIteration:
+    raise RuntimeError("Could not find root directory (.git/ not found)")
 
-FG: Colour = (190, 190, 255)
-FG_HEADER: Colour = (130, 130, 200)
-FG_BORDER: Colour = (208, 208, 255)
 
-BG_BUTTON_HOVER: Colour = (12, 12, 24)
-FG_BUTTON_HOVER: Colour = (14, 204, 128)
+ASSETS_DIR = ROOT_DIR / "assets"
 
-FG_ERROR: Colour = (255, 108, 108)
-FG_WIN: Colour = (255, 210, 0)
+FONTS_DIR = ASSETS_DIR / "fonts"
+IMAGES_DIR = ASSETS_DIR / "images"
+SOUNDS_DIR = ASSETS_DIR / "sounds"

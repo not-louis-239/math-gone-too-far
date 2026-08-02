@@ -20,6 +20,7 @@
 
 
 import sys
+import time
 from pathlib import Path
 
 import pygame as pg
@@ -46,9 +47,21 @@ def _run():
             if event.type == pg.QUIT:
                 running = False
 
+        t_i = time.perf_counter()
         game.update(dt_s)
+        t_update = time.perf_counter()
         game.take_input(keys, events, dt_s)
+        t_input = time.perf_counter()
         game.draw(screen)
+        t_draw = time.perf_counter()
+
+        game.diagnostics.snapshot_container.record(t_i, t_update, t_input, t_draw)
+        game.diagnostics.snapshot_container.prune()
+
+        if game.diagnostics.enabled:
+            game.diagnostics.draw_fps_diagnostic(screen)
+            game.diagnostics.draw_debug_mouse_pointer(screen)
+
         pg.display.flip()
 
 

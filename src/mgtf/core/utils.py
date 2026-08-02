@@ -50,4 +50,17 @@ def _get_text_surf(font: pg.font.Font, text: str, colour: Colour) -> pg.Surface:
     return font.render(text, True, colour)
 
 def get_text_surf(font: pg.font.Font, text: str, colour: Colour) -> pg.Surface:
+    # This is a typed wrapper because using `@lru_cache` directly breaks type hinting
     return _get_text_surf(font, text, colour)
+
+
+def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
+    return (
+        int(c1[0] * (1 - t) + c2[0] * t),
+        int(c1[1] * (1 - t) + c2[1] * t),
+        int(c1[2] * (1 - t) + c2[2] * t)
+    )
+
+
+def clamp(val: float, lower: float, upper: float) -> float:
+    return max(lower, min(val, upper))

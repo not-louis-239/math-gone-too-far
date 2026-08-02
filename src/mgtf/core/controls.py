@@ -17,18 +17,21 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.core.custom_types import Colour, AColour
+from enum import IntEnum
+
+import pygame as pg
 
 
-BG: Colour = (5, 5, 10)
-BG_PANEL: AColour = (0, 0, 0, 150)
+class Controls(IntEnum):
+    MOVE_UP = pg.K_w
+    MOVE_DOWN = pg.K_s
+    MOVE_LEFT = pg.K_a
+    MOVE_RIGHT = pg.K_d
 
-FG: Colour = (190, 190, 255)
-FG_HEADER: Colour = (130, 130, 200)
-FG_BORDER: Colour = (208, 208, 255)
+    INVENTORY = pg.K_e
+    GENERIC_ESCAPE = pg.K_ESCAPE
 
-BG_BUTTON_HOVER: Colour = (12, 12, 24)
-FG_BUTTON_HOVER: Colour = (14, 204, 128)
+    CONFIRM = pg.K_z
+    BACK = pg.K_x
 
-FG_ERROR: Colour = (255, 108, 108)
-FG_WIN: Colour = (255, 210, 0)
+    DEBUG_TOGGLE = pg.K_F10

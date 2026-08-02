@@ -20,10 +20,16 @@
 import pygame as pg
 
 from mgtf.game.states import State, StateID, TitleState, GameState
+from mgtf.core.asset_manager import Assets
+from mgtf.debug.diagnostics import Diagnostics
+from mgtf.core.controls import Controls
 
 
 class Game:
     def __init__(self) -> None:
+        self.assets = Assets()
+        self.diagnostics = Diagnostics(self.assets)
+
         self.state: StateID = StateID.TITLE
         self.states: dict[StateID, State] = {
             StateID.TITLE: TitleState(),
@@ -35,6 +41,10 @@ class Game:
 
     def take_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> None:
         self.states[self.state].take_input(keys, events, dt_s)
+
+        for event in events:
+            if event.type == pg.KEYDOWN and event.key == Controls.DEBUG_TOGGLE:
+                self.diagnostics.toggle_visibility()
 
     def draw(self, screen: pg.Surface) -> None:
         self.states[self.state].draw(screen)
