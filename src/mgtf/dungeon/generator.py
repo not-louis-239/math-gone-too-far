@@ -17,9 +17,30 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-FPS = 60
-WN_W, WN_H = 1280, 720
+from mgtf.dungeon.dungeon import Dungeon
+from mgtf.dungeon.tile import TileType
+from mgtf.dungeon.constants import MIN_AREA_COEFF, MAX_RETRIES
 
-BORDER_W = 2
 
-TILE_WIDTH, TILE_DEPTH, TILE_HEIGHT = 48, 48, 48  # pixels
+def _make_dungeon(width: int, height: int) -> Dungeon:
+    ...
+
+
+def generate_dungeon(width: int, height: int) -> Dungeon:
+    """Make a dungeon, enforcing `MIN_AREA_COEFF`"""
+
+    min_area = width * height * MIN_AREA_COEFF
+
+    for _ in range(MAX_RETRIES):
+        test_dungeon = _make_dungeon(width, height)
+
+        non_wall = sum(
+            1 for x in range(width)
+            for y in range(height)
+            if test_dungeon.tiles[y][x].typ != TileType.WALL
+        )
+
+        if non_wall >= min_area:
+            break
+
+    return test_dungeon

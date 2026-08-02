@@ -17,9 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-FPS = 60
-WN_W, WN_H = 1280, 720
+DUNGEON_W, DUNGEON_H = 80, 80
 
-BORDER_W = 2
+MAX_RETRIES = 20
 
-TILE_WIDTH, TILE_DEPTH, TILE_HEIGHT = 48, 48, 48  # pixels
+# spawn rate coefficients
+ROOM_SPAWN_COEFF = 0.005
+MIN_AREA_COEFF = 0.2
+
+# room bounds, spanning from room or hallway centres
+ROOM_W_MIN, ROOM_W_MAX = 1, 5
+ROOM_H_MIN, ROOM_H_MAX = 1, 5
+HALLWAY_W = 1

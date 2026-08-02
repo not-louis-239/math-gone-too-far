@@ -17,9 +17,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-FPS = 60
-WN_W, WN_H = 1280, 720
+from enum import StrEnum
+from typing import Literal
 
-BORDER_W = 2
 
-TILE_WIDTH, TILE_DEPTH, TILE_HEIGHT = 48, 48, 48  # pixels
+class TileType(StrEnum):
+    # these must match the tile type keys in `assets/lore/tiles.json`
+
+    EMPTY = "empty"
+    WALL = "wall"
+    DOOR = "door"
+
+
+class Tile:
+    def __init__(self, typ: TileType) -> None:
+        self.typ = typ
+        self.explored: bool = False
+
+        self.activated: bool = False
+        self.facing: Literal["n", "e", "s", "w"] = "n"
+        self.flipped: bool = False

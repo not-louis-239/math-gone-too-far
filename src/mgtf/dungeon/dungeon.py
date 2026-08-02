@@ -17,9 +17,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-FPS = 60
-WN_W, WN_H = 1280, 720
+from mgtf.dungeon.tile import Tile, TileType
 
-BORDER_W = 2
 
-TILE_WIDTH, TILE_DEPTH, TILE_HEIGHT = 48, 48, 48  # pixels
+class Dungeon:
+    def __init__(self, width: int, height: int) -> None:
+        self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(height)]

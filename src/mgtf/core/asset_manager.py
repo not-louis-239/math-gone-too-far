@@ -19,7 +19,7 @@
 
 import pygame as pg
 
-from mgtf.core.paths import FONTS_DIR
+from mgtf.core.paths import FONTS_DIR, IMAGES_DIR
 
 
 class Fonts:
@@ -36,7 +36,15 @@ class Fonts:
 
 class Images:
     def __init__(self) -> None:
-        pass
+        def load(name: str) -> pg.Surface:
+            return pg.image.load(IMAGES_DIR / name).convert_alpha()
+
+        self.floor = load("floor.png")
+        self.wall = load("wall.png")
+        self.door_north = load("door_north.png")
+        self.door_east = load("door_east.png")
+        self.door_south = load("door_south.png")
+        self.door_west = load("door_west.png")
 
 
 class Sounds:
