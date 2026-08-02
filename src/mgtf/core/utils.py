@@ -18,6 +18,7 @@
 
 
 from functools import lru_cache
+import random
 
 import pygame as pg
 
@@ -64,3 +65,7 @@ def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
 
 def clamp(val: float, lower: float, upper: float) -> float:
     return max(lower, min(val, upper))
+
+
+def chance(p: float) -> bool:
+    return random.random() < p

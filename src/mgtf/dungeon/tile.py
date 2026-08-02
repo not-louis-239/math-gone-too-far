@@ -18,7 +18,6 @@
 
 
 from enum import StrEnum
-from typing import Literal
 
 
 class TileType(StrEnum):
@@ -29,11 +28,18 @@ class TileType(StrEnum):
     DOOR = "door"
 
 
+class TileFacing(StrEnum):
+    NORTH = "n"
+    EAST = "e"
+    SOUTH = "s"
+    WEST = "w"
+
+
 class Tile:
     def __init__(self, typ: TileType) -> None:
         self.typ = typ
         self.explored: bool = False
 
         self.activated: bool = False
-        self.facing: Literal["n", "e", "s", "w"] = "n"
+        self.facing: TileFacing = TileFacing.SOUTH
         self.flipped: bool = False

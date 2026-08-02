@@ -23,8 +23,9 @@ import random
 from collections import deque
 from dataclasses import dataclass
 
+from mgtf.core.utils import chance
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.tile import Tile, TileType
+from mgtf.dungeon.tile import TileType, TileFacing
 from mgtf.dungeon.constants import (
     MIN_AREA_COEFF,
     ROOM_SPAWN_COEFF,
@@ -214,11 +215,9 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                     dungeon[x, closest.centre_y].typ = TileType.EMPTY
 
     # Make doors in the rooms
-    # TODO: Add facing logic to orient the doors correctly, including with double doors
-
     for room in rooms:
         # Upper and lower edge
-        for y in (room.top - 1, room.top + room.height):
+        for y, facing in ((room.top - 1, TileFacing.NORTH), (room.top + room.height, TileFacing.SOUTH)):
             if 0 <= y < height:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
@@ -228,13 +227,18 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                     else:
                         if len(chain) == 1:
                             dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].flipped = chance(0.5)
+                            dungeon[chain[0]].facing = facing
                         elif len(chain) == 2:
                             dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].flipped = True
+                            dungeon[chain[0]].facing = facing
                             dungeon[chain[1]].typ = TileType.DOOR
+                            dungeon[chain[1]].facing = facing
                         chain.clear()
 
         # Left and right edge
-        for x in (room.left - 1, room.left + room.width):
+        for x, facing in ((room.left - 1, TileFacing.WEST), (room.left + room.width, TileFacing.EAST)):
             if 0 <= x < width:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
@@ -244,9 +248,14 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                     else:
                         if len(chain) == 1:
                             dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].flipped = chance(0.5)
+                            dungeon[chain[0]].facing = facing
                         elif len(chain) == 2:
                             dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].flipped = True
+                            dungeon[chain[0]].facing = facing
                             dungeon[chain[1]].typ = TileType.DOOR
+                            dungeon[chain[1]].facing = facing
                         chain.clear()
 
     # Find the empty space that has the most unbroken area, and use that
@@ -296,4 +305,4 @@ def generate_dungeon() -> Dungeon:
         if non_wall >= min_area:
             break
 
-    return test_dungeon
+    return test_dungeon  # type: ignore
