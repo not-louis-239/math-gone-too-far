@@ -1,0 +1,11 @@
+{
+    "empty": {},
+    "wall": {
+        "solid": true,
+        "opaque": true
+    },
+    "door": {
+        "solid": true,
+        "opaque": true
+    }
+}
