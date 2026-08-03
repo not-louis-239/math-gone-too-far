@@ -125,7 +125,11 @@ class GameState(State):
                 # Skip rendering wall tiles that are entirely surrounded by walls
                 if (
                     tile.typ == TileType.WALL
-                    and all(self.current_floor[x + dx, z + dz].typ == TileType.WALL for dx, dz in NEIGHBOURS)
+                    and all(
+                        self.current_floor[x + dx, z + dz].typ == TileType.WALL
+                        for dx, dz in NEIGHBOURS
+                        if 0 <= x + dx < DUNGEON_W and 0 <= z + dz < DUNGEON_H
+                    )
                 ):
                     continue
 
