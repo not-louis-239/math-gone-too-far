@@ -115,7 +115,7 @@ class GameState(State):
         render_left = max(0, round(self.player.pos.x) - RENDER_DISTANCE_X)
         render_right = min(DUNGEON_W - 1, round(self.player.pos.x) + RENDER_DISTANCE_X)
         render_back = max(0, round(self.player.pos.z) - RENDER_DISTANCE_Z)
-        render_front = min(DUNGEON_H - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z)
+        render_front = min(DUNGEON_H - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z + 1)
 
         for z in range(render_back, render_front + 1):
             # Draw tiles first
