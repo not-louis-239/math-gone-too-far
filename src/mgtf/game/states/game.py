@@ -29,7 +29,7 @@ import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
 from mgtf.objects.hitbox import collides
 from mgtf.dungeon.generator import generate_dungeon
-from mgtf.dungeon.tile import TileType
+from mgtf.dungeon.tile import TileType, TileFacing
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
 from mgtf.objects.player import Player
@@ -140,7 +140,26 @@ class GameState(State):
                     image = self.game.assets.images.wall
                 elif tile.typ == TileType.DOOR:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
-                    image = self.game.assets.images.door_south
+                    if not tile.activated:
+                        if tile.facing == TileFacing.NORTH:
+                            image = self.game.assets.images.door_north
+                        elif tile.facing == TileFacing.EAST:
+                            image = self.game.assets.images.door_east
+                        elif tile.facing == TileFacing.SOUTH:
+                            image = self.game.assets.images.door_south
+                        elif tile.facing == TileFacing.WEST:
+                            image = self.game.assets.images.door_west
+                    else:
+                        # DEBUG placeholder for activated doors
+                        if tile.facing == TileFacing.NORTH:
+                            image = self.game.assets.images.door_north
+                        elif tile.facing == TileFacing.EAST:
+                            image = self.game.assets.images.door_east
+                        elif tile.facing == TileFacing.SOUTH:
+                            image = self.game.assets.images.door_south
+                        elif tile.facing == TileFacing.WEST:
+                            image = self.game.assets.images.door_west
+
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
                 else:
@@ -148,7 +167,7 @@ class GameState(State):
 
                 surface.blit(image, (tile_left, tile_top))
 
-            for entity in (e for e in all_entities if z - 0.5 <= e.pos.z < z + 0.5):
+            for entity in (e for e in all_entities if z == round(e.pos.z)):
                 entity_top = SCREEN_CENTRE_Z + (entity.pos.z - self.player.pos.z - entity.hitbox.d / 2) * TILE_DEPTH - entity.hitbox.h * TILE_HEIGHT
                 entity_left = SCREEN_CENTRE_X + (entity.pos.x - self.player.pos.x - entity.hitbox.w / 2) * TILE_WIDTH
                 surface.blit(entity.image, (entity_left, entity_top))

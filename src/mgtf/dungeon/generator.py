@@ -222,7 +222,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
                 for x in range(room.left, room.left + room.width):
-                    if dungeon[y][x]:
+                    if dungeon[y][x].typ == TileType.EMPTY:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
@@ -243,7 +243,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
                 for y in range(room.top, room.top + room.height):
-                    if dungeon[y][x]:
+                    if dungeon[y][x].typ == TileType.EMPTY:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
