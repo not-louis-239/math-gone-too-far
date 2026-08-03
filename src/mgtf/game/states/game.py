@@ -17,14 +17,22 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from typing import TYPE_CHECKING
+
 from pygame import Surface, Event
 from pygame.key import ScancodeWrapper
 
 from .base import State
 import mgtf.core.colours as cols
 
+if TYPE_CHECKING:
+    from mgtf.game.game import Game
+
 
 class GameState(State):
+    def __init__(self, game: Game) -> None:
+        super().__init__(game)
+
     def update(self, dt_s: float) -> None:
         pass
 

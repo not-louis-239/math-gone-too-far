@@ -18,11 +18,18 @@
 
 
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 import pygame as pg
 
+if TYPE_CHECKING:
+    from mgtf.game.game import Game
+
 
 class State(ABC):
+    def __init__(self, game: Game) -> None:
+        self.game = game
+
     def reset(self) -> None:
         pass
 

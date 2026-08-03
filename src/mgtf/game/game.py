@@ -32,8 +32,8 @@ class Game:
 
         self.state: StateID = StateID.TITLE
         self.states: dict[StateID, State] = {
-            StateID.TITLE: TitleState(),
-            StateID.GAME: GameState()
+            StateID.TITLE: TitleState(self),
+            StateID.GAME: GameState(self)
         }
 
     def update(self, dt_s: float) -> None:
