@@ -18,6 +18,15 @@
 
 
 from enum import StrEnum
+import json
+
+from dataclasses import dataclass
+
+
+@dataclass
+class TileProperties:
+    solid: bool
+    opaque: bool
 
 
 class TileType(StrEnum):
@@ -26,6 +35,7 @@ class TileType(StrEnum):
     EMPTY = "empty"
     WALL = "wall"
     DOOR = "door"
+    ENTRANCE = "entrance"
 
 
 class TileFacing(StrEnum):

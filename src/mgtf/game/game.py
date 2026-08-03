@@ -30,7 +30,7 @@ class Game:
         self.assets = Assets()
         self.diagnostics = Diagnostics(self.assets)
 
-        self.state: StateID = StateID.TITLE
+        self.state: StateID = StateID.GAME
         self.states: dict[StateID, State] = {
             StateID.TITLE: TitleState(self),
             StateID.GAME: GameState(self)

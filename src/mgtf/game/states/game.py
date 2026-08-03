@@ -24,6 +24,9 @@ from pygame.key import ScancodeWrapper
 
 from .base import State
 import mgtf.core.colours as cols
+from mgtf.dungeon.generator import generate_dungeon
+from mgtf.dungeon.dungeon import Dungeon
+from mgtf.objects.player import Player
 
 if TYPE_CHECKING:
     from mgtf.game.game import Game
@@ -32,6 +35,14 @@ if TYPE_CHECKING:
 class GameState(State):
     def __init__(self, game: Game) -> None:
         super().__init__(game)
+
+        self.player = Player((0, 0), self.game.assets.images.player)
+
+        self.reset()
+
+    def reset(self) -> None:
+        self.dungeon_levels: dict[int, Dungeon] = {1: generate_dungeon()}  # {floor: dungeon}
+        self.player.reset()
 
     def update(self, dt_s: float) -> None:
         pass

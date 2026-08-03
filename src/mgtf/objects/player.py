@@ -21,4 +21,5 @@ from mgtf.objects.entity import Entity
 
 
 class Player(Entity):
-    pass
+    def reset(self) -> None:
+        pass

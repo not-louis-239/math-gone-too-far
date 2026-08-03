@@ -32,10 +32,11 @@ from mgtf.game.game import Game
 
 
 def _run():
-    game = Game()
-    clock = pg.time.Clock()
     screen = pg.display.set_mode((WN_W, WN_H), pg.DOUBLEBUF)
     pg.display.set_caption("Math Gone Too Far")
+
+    game = Game()
+    clock = pg.time.Clock()
 
     running = True
     while running:
