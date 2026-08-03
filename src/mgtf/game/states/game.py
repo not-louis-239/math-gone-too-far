@@ -33,10 +33,11 @@ from mgtf.objects.player import Player
 from mgtf.core.constants import (
     TILE_WIDTH,
     TILE_DEPTH,
+    TILE_HEIGHT,
     SCREEN_CENTRE_X,
-    SCREEN_CENTRE_Y,
+    SCREEN_CENTRE_Z,
     RENDER_DISTANCE_X,
-    RENDER_DISTANCE_Y
+    RENDER_DISTANCE_Z
 )
 
 if TYPE_CHECKING:
@@ -47,7 +48,7 @@ class GameState(State):
     def __init__(self, game: Game) -> None:
         super().__init__(game)
 
-        self.player = Player((0, 0), self.game.assets.images.player)
+        self.player = Player((0, 0, 0), self.game.assets.images.player)
         self.floor = 1
 
         self.reset()
@@ -61,9 +62,9 @@ class GameState(State):
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
         if keys[Controls.MOVE_UP]:
-            self.player.pos.y -= self.player.speed * dt_s
+            self.player.pos.z -= self.player.speed * dt_s
         if keys[Controls.MOVE_DOWN]:
-            self.player.pos.y += self.player.speed * dt_s
+            self.player.pos.z += self.player.speed * dt_s
         if keys[Controls.MOVE_LEFT]:
             self.player.pos.x -= self.player.speed * dt_s
         if keys[Controls.MOVE_RIGHT]:
@@ -73,15 +74,26 @@ class GameState(State):
         surface.fill(cols.BG)
         all_entities = [self.player]
 
-        for y, row in enumerate(self.dungeon_levels[self.floor]):
+        current_floor = self.dungeon_levels[self.floor]
+
+        render_left = math.floor(self.player.pos.x) - RENDER_DISTANCE_X
+        render_right = math.floor(self.player.pos.x) + RENDER_DISTANCE_X
+        render_back = math.floor(self.player.pos.z) - RENDER_DISTANCE_Z
+        render_front = math.floor(self.player.pos.z) + RENDER_DISTANCE_Z
+
+        for z in range(render_back, render_front + 1):
             # Draw tiles first
-            for x, tile in enumerate(row):
+            for x in range(render_left, render_right + 1):
+                tile = current_floor[x, z]
+
                 tile_left = SCREEN_CENTRE_X + (x - self.player.pos.x - 0.5) * TILE_WIDTH
-                tile_top = SCREEN_CENTRE_Y + (y - self.player.pos.y - 1) * TILE_DEPTH
+                tile_top = SCREEN_CENTRE_Z + (z - self.player.pos.z - 1) * TILE_DEPTH - self.player.pos.y * TILE_HEIGHT
+
 
                 if tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
                 elif tile.typ == TileType.DOOR:
+                    surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     image = self.game.assets.images.door_south
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
@@ -91,7 +103,7 @@ class GameState(State):
                 surface.blit(image, (tile_left, tile_top))
 
             # Draw entities infront
-            for entity in (e for e in all_entities if math.floor(e.pos.y) == y):
+            for entity in (e for e in all_entities if z - 1 < e.pos.z < z):
                 entity_left = SCREEN_CENTRE_X + (entity.pos.x - self.player.pos.x - 0.5) * TILE_WIDTH
-                entity_top = SCREEN_CENTRE_Y + (entity.pos.y - self.player.pos.y - 1) * TILE_DEPTH
+                entity_top = SCREEN_CENTRE_Z + (entity.pos.z - self.player.pos.z - 1) * TILE_DEPTH
                 surface.blit(entity.image, (entity_left, entity_top))

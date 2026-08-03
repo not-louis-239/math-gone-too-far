@@ -20,11 +20,15 @@
 from pygame import Surface
 
 from mgtf.objects.entity import Entity
+from mgtf.objects.hitbox import Hitbox
+
+
+PLAYER_HITBOX = Hitbox(38 / 48, 75 / 48, 8 / 48)
 
 
 class Player(Entity):
-    def __init__(self, pos: tuple[int, int], image: Surface) -> None:
-        super().__init__(pos, image)
+    def __init__(self, pos: tuple[int, int, int], image: Surface) -> None:
+        super().__init__(pos, image, PLAYER_HITBOX)
         self.speed = 5
 
     def reset(self) -> None:

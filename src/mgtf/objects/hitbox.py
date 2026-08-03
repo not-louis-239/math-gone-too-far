@@ -19,8 +19,6 @@
 
 from __future__ import annotations
 
-import pygame as pg
-
 
 class Hitbox:
     def __init__(self, w: float, h: float, d: float) -> None:
