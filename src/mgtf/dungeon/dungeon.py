@@ -19,7 +19,9 @@
 
 from typing import overload, Iterator
 
+from mgtf.core.asset_manager import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileType
+from mgtf.objects.hitbox import Hitbox
 
 
 class Dungeon:
@@ -43,3 +45,25 @@ class Dungeon:
     def __iter__(self) -> Iterator[list[Tile]]:
         for row in self.tiles:
             yield row
+
+    def is_vacant(self, pos: tuple[int, int], hitbox: Hitbox) -> bool:
+        """Determine, given a `pos` and a `hitbox`, whether `pos` is vacant and does not overlap
+        any walls."""
+        px, pz = pos
+        left, right = px - hitbox.w / 2, px + hitbox.w / 2
+        back, front = pz - hitbox.d / 2, pz + hitbox.d / 2
+
+        for tx in range(px - 1, px + 2):
+            for tz in range(pz - 1, pz + 2):
+                if (
+                    TILE_PROPERTIES[self[tx, tz].typ].solid
+                    and not (
+                        left > tx + 0.5
+                        or right < tx - 0.5
+                        or back > tz + 0.5
+                        or front < tz - 0.5
+                    )
+                ):
+                    return False
+
+        return True

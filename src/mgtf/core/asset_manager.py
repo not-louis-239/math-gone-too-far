@@ -59,12 +59,11 @@ class Sounds:
         pass
 
 
-class Lore:
-    def __init__(self) -> None:
-        with open(LORE_DIR / "tiles.json") as f:
-            self.tile_properties: dict[TileType, TileProperties] = {
-                tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
-            }
+# Load lore
+with open(LORE_DIR / "tiles.json") as f:
+    TILE_PROPERTIES: dict[TileType, TileProperties] = {
+        tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
+    }
 
 
 class Assets:
@@ -72,4 +71,3 @@ class Assets:
         self.fonts = Fonts()
         self.images = Images()
         self.sounds = Sounds()
-        self.lore = Lore()

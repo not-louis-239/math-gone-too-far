@@ -32,6 +32,7 @@ from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType, TileFacing
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
+from mgtf.core.asset_manager import TILE_PROPERTIES
 from mgtf.objects.player import Player
 from mgtf.core.constants import (
     TILE_WIDTH,
@@ -92,7 +93,7 @@ class GameState(State):
                 tile = self.current_floor[x, z]
 
                 if (
-                    self.game.assets.lore.tile_properties[tile.typ].solid
+                    TILE_PROPERTIES[tile.typ].solid
                     and collides(
                         self.player.pos,
                         self.player.hitbox,
@@ -148,7 +149,7 @@ class GameState(State):
                             image = self.game.assets.images.door_east
                         elif tile.facing == TileFacing.SOUTH:
                             image = self.game.assets.images.door_south
-                        elif tile.facing == TileFacing.WEST:
+                        else:
                             image = self.game.assets.images.door_west
                     else:
                         # DEBUG placeholder for activated doors
@@ -158,7 +159,7 @@ class GameState(State):
                             image = self.game.assets.images.door_east
                         elif tile.facing == TileFacing.SOUTH:
                             image = self.game.assets.images.door_south
-                        elif tile.facing == TileFacing.WEST:
+                        else:
                             image = self.game.assets.images.door_west
 
                 elif tile.typ == TileType.EMPTY:
