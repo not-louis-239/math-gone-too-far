@@ -17,9 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from pygame import Surface
+
 from mgtf.objects.entity import Entity
 
 
 class Player(Entity):
+    def __init__(self, pos: tuple[int, int], image: Surface) -> None:
+        super().__init__(pos, image)
+        self.speed = 5
+
     def reset(self) -> None:
         pass

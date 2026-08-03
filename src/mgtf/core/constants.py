@@ -17,9 +17,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+import math
+
+
 FPS = 60
 WN_W, WN_H = 1280, 720
 
 BORDER_W = 2
 
+# Each tile is 1m * 1 * 2m
 TILE_WIDTH, TILE_DEPTH, TILE_HEIGHT = 48, 48, 48  # pixels
+
+SCREEN_CENTRE_X, SCREEN_CENTRE_Y = WN_W // 2, WN_H // 2
+RENDER_DISTANCE_X = math.ceil(SCREEN_CENTRE_X / TILE_WIDTH)
+RENDER_DISTANCE_Y = math.ceil(SCREEN_CENTRE_Y / TILE_DEPTH)

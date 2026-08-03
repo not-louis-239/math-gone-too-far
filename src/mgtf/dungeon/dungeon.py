@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from typing import overload
+from typing import overload, Iterator
 
 from mgtf.dungeon.tile import Tile, TileType
 
@@ -34,3 +34,7 @@ class Dungeon:
         if isinstance(key, int):
             return self.tiles[key]
         return self.tiles[key[1]][key[0]]
+
+    def __iter__(self) -> Iterator[list[Tile]]:
+        for row in self.tiles:
+            yield row
