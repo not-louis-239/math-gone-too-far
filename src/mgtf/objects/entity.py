@@ -38,23 +38,36 @@ class Hitbox:
         yield self.d
 
 
+class Facing(StrEnum):
+    NORTH = "n"
+    EAST = "e"
+    SOUTH = "s"
+    WEST = "w"
+
+
 class Entity:
-    def __init__(self, pos: tuple[int, int, int], image: pg.Surface, hitbox: Hitbox) -> None:
+    def __init__(self, pos: tuple[int, int, int], images: dict[Facing, pg.Surface], base_hitbox: Hitbox) -> None:
         self.pos: pg.Vector3 = pg.Vector3(pos[0], pos[1], pos[2])
-        self.image = image
-        self.hitbox = hitbox
+        self.facing: Facing = Facing.NORTH
+        self.images = images
+        self._base_hitbox = base_hitbox  # hitbox when facing south
+        self._perp_hitbox = Hitbox(base_hitbox.d, base_hitbox.h, base_hitbox.w)
+
+    @property
+    def hitbox(self) -> Hitbox:
+        return self._base_hitbox if self.facing in (Facing.NORTH, Facing.SOUTH) else self._perp_hitbox
 
     @property
     def left(self) -> float:
-        return self.pos.x - self.hitbox.w / 2
+        return self.pos.x - self._base_hitbox.w / 2
 
     @property
     def right(self) -> float:
-        return self.pos.x + self.hitbox.w / 2
+        return self.pos.x + self._base_hitbox.w / 2
 
     @property
     def top(self) -> float:
-        return self.pos.y + self.hitbox.h
+        return self.pos.y + self._base_hitbox.h
 
     @property
     def bottom(self) -> float:
@@ -62,18 +75,11 @@ class Entity:
 
     @property
     def back(self) -> float:
-        return self.pos.z - self.hitbox.d / 2
+        return self.pos.z - self._base_hitbox.d / 2
 
     @property
     def front(self) -> float:
-        return self.pos.z + self.hitbox.d / 2
-
-
-class Facing(StrEnum):
-    NORTH = "n"
-    EAST = "e"
-    SOUTH = "s"
-    WEST = "w"
+        return self.pos.z + self._base_hitbox.d / 2
 
 
 def collides(

@@ -100,6 +100,9 @@ class Diagnostics:
         pg.mouse.set_visible(not self.enabled)
 
     def _draw_fps_graph(self, surface: pg.Surface) -> None:
+        if not self.snapshot_container.snapshots:
+            return
+
         for i, snapshot in enumerate(self.snapshot_container.snapshots):
             # Get durations first
             total_duration = sum(interval.duration for interval in snapshot.intervals)
@@ -146,7 +149,7 @@ class Diagnostics:
         for avg, label, colour, y_pos in (
             (update_avg, "update", COL_UPDATE, WN_H - _MAX_GRAPH_H - 45),
             (input_avg, "input", COL_INPUT, WN_H - _MAX_GRAPH_H - 25),
-            (draw_avg, "draw", col_draw, WN_H - _MAX_GRAPH_H - 5),
+            (draw_avg, "draw", col_draw, WN_H - _MAX_GRAPH_H - 5),  # type: ignore
         ):
             text_surf = get_text_surf(self.fps_graph_font_small, f"{label}: {avg * 1000:,.3g} ms avg", colour)
             surface.blit(text_surf, text_surf.get_rect(bottom=y_pos, left=10))

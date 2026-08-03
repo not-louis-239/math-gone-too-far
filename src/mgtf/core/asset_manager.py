@@ -54,7 +54,10 @@ class Images:
 
         # entities
         self.player: dict[Facing, pg.Surface] = {
-            Facing.NORTH: load("player_north.png")
+            Facing.NORTH: load("player_north.png"),
+            Facing.EAST: load("player_east.png"),
+            Facing.SOUTH: load("player_south.png"),
+            Facing.WEST: load("player_west.png")
         }
 
 
