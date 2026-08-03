@@ -30,6 +30,8 @@ class Dungeon:
         self.width = width
         self.depth = depth
 
+        self.entrance_pos: tuple[int, int] = (0, 0)
+
     @overload
     def __getitem__(self, key: int) -> list[Tile]: ...
     @overload
@@ -46,15 +48,15 @@ class Dungeon:
         for row in self.tiles:
             yield row
 
-    def is_vacant(self, pos: tuple[int, int], hitbox: Hitbox) -> bool:
+    def is_vacant(self, pos: tuple[float, float], hitbox: Hitbox) -> bool:
         """Determine, given a `pos` and a `hitbox`, whether `pos` is vacant and does not overlap
         any walls."""
         px, pz = pos
         left, right = px - hitbox.w / 2, px + hitbox.w / 2
         back, front = pz - hitbox.d / 2, pz + hitbox.d / 2
 
-        for tx in range(px - 1, px + 2):
-            for tz in range(pz - 1, pz + 2):
+        for tx in range(round(px) - 1, round(px) + 2):
+            for tz in range(round(pz) - 1, round(pz) + 2):
                 if (
                     TILE_PROPERTIES[self[tx, tz].typ].solid
                     and not (

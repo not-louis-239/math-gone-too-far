@@ -275,15 +275,25 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
             fills.append(reachable)
 
     # Pick the largest fill and copy its area onto the dungeon
+    # This is to cull unreachable areas
     fills.sort(key=len, reverse=True)
-    chosen = fills[0]
+    chosen_fill = fills[0]
 
     final_dungeon = Dungeon(width, height)
 
     for y in range(height):
         for x in range(width):
-            if (x, y) in chosen:
+            if (x, y) in chosen_fill:
                 final_dungeon[x, y] = dungeon[x, y]
+
+    # Get all the rooms that are still there after cutting off unreachable areas
+    rooms = [r for r in rooms if (r.left, r.top) in chosen_fill]
+
+    # Pick a random room and one of its four corners to be the entrance
+    entrance_room = random.choice(rooms)
+    entrance_x = random.choice((entrance_room.left, entrance_room.right))
+    entrance_y = random.choice((entrance_room.top, entrance_room.bottom))
+    final_dungeon.entrance_pos = (entrance_x, entrance_y)
 
     return final_dungeon
 

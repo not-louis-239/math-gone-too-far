@@ -67,6 +67,7 @@ class GameState(State):
     def reset(self) -> None:
         self.dungeon_levels: dict[int, Dungeon] = {1: generate_dungeon()}  # {floor: dungeon}
         self.player.reset()
+        self.player.pos.x, self.player.pos.z = self.dungeon_levels[1].entrance_pos
 
     def update(self, dt_s: float) -> None:
         pass
@@ -76,39 +77,24 @@ class GameState(State):
         # is randomly stopping when moving diagonally up against a wall
 
         if keys[Controls.MOVE_BACK]:
-            self.player.pos.z -= self.player.speed * dt_s
+            target_pos = (self.player.pos.x, self.player.pos.z - self.player.speed * dt_s)
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
+                self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_FWD]:
-            self.player.pos.z += self.player.speed * dt_s
+            target_pos = (self.player.pos.x, self.player.pos.z + self.player.speed * dt_s)
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
+                self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_LEFT]:
-            self.player.pos.x -= self.player.speed * dt_s
+            target_pos = (self.player.pos.x - self.player.speed * dt_s, self.player.pos.z)
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
+                self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_RIGHT]:
-            self.player.pos.x += self.player.speed * dt_s
-
-        # if the player is touching a wall, push them away from the wall
-        for x in range(max(0, round(self.player.pos.x) - 1), min(DUNGEON_W, round(self.player.pos.x) + 2)):
-            for z in range(max(0, round(self.player.pos.z) - 1), min(DUNGEON_H, round(self.player.pos.z) + 2)):
-                tile = self.current_floor[x, z]
-
-                if (
-                    TILE_PROPERTIES[tile.typ].solid
-                    and collides(
-                        self.player.pos,
-                        self.player.hitbox,
-                        (x, 0, z),
-                        (1, 1, 1)
-                    )
-                ):
-                    x_overlap = min(abs(self.player.left - (x + 0.5)), abs(self.player.right - (x - 0.5)))
-                    z_overlap = min(abs(self.player.back - (z + 0.5)), abs(self.player.front - (z - 0.5)))
-
-                    if x_overlap > z_overlap:
-                        self.player.pos.z += self.player.speed * (1 if z < self.player.pos.z else -1) * dt_s
-                    elif z_overlap > x_overlap:
-                        self.player.pos.x += self.player.speed * (1 if x < self.player.pos.x else -1) * dt_s
-                    print(f"{x_overlap = }, {z_overlap = }")
+            target_pos = (self.player.pos.x - self.player.speed * dt_s, self.player.pos.z)
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
+                self.player.pos.x, self.player.pos.z = target_pos
 
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
