@@ -17,30 +17,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from pygame import Surface
 
-import pygame as pg
-
-if TYPE_CHECKING:
-    from mgtf.game.game import Game
+from mgtf.objects.entity import Entity
+from mgtf.objects.hitbox import Hitbox
 
 
-class State(ABC):
-    def __init__(self, game: Game) -> None:
-        self.game = game
+PLAYER_HITBOX = Hitbox(38 / 48, 75 / 48, 8 / 48)
+
+
+class Player(Entity):
+    def __init__(self, pos: tuple[int, int, int], image: Surface) -> None:
+        super().__init__(pos, image, PLAYER_HITBOX)
+        self.speed = 5
 
     def reset(self) -> None:
         pass
-
-    @abstractmethod
-    def update(self, dt_s: float) -> None:
-        ...
-
-    @abstractmethod
-    def take_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> None:
-        ...
-
-    @abstractmethod
-    def draw(self, surface: pg.Surface) -> None:
-        ...

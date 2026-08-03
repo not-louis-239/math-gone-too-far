@@ -17,30 +17,39 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+
 
 import pygame as pg
 
-if TYPE_CHECKING:
-    from mgtf.game.game import Game
+from mgtf.objects.hitbox import Hitbox
 
 
-class State(ABC):
-    def __init__(self, game: Game) -> None:
-        self.game = game
+class Entity:
+    def __init__(self, pos: tuple[int, int, int], image: pg.Surface, hitbox: Hitbox) -> None:
+        self.pos: pg.Vector3 = pg.Vector3(pos[0], pos[1], pos[2])
+        self.image = image
+        self.hitbox = hitbox
 
-    def reset(self) -> None:
-        pass
+    @property
+    def left(self) -> float:
+        return self.pos.x - self.hitbox.w / 2
 
-    @abstractmethod
-    def update(self, dt_s: float) -> None:
-        ...
+    @property
+    def right(self) -> float:
+        return self.pos.x + self.hitbox.w / 2
 
-    @abstractmethod
-    def take_input(self, keys: pg.key.ScancodeWrapper, events: list[pg.event.Event], dt_s: float) -> None:
-        ...
+    @property
+    def top(self) -> float:
+        return self.pos.y + self.hitbox.h
 
-    @abstractmethod
-    def draw(self, surface: pg.Surface) -> None:
-        ...
+    @property
+    def bottom(self) -> float:
+        return self.pos.y
+
+    @property
+    def back(self) -> float:
+        return self.pos.z - self.hitbox.d / 2
+
+    @property
+    def front(self) -> float:
+        return self.pos.z + self.hitbox.d / 2

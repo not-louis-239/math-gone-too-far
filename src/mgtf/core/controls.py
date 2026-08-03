@@ -23,8 +23,8 @@ import pygame as pg
 
 
 class Controls(IntEnum):
-    MOVE_UP = pg.K_w
-    MOVE_DOWN = pg.K_s
+    MOVE_BACK = pg.K_w
+    MOVE_FWD = pg.K_s
     MOVE_LEFT = pg.K_a
     MOVE_RIGHT = pg.K_d
 

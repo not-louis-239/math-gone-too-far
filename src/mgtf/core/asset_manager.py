@@ -17,9 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+import json
+
 import pygame as pg
 
-from mgtf.core.paths import FONTS_DIR, IMAGES_DIR
+from mgtf.core.paths import FONTS_DIR, IMAGES_DIR, LORE_DIR
+from mgtf.dungeon.tile import TileProperties, TileType
 
 
 class Fonts:
@@ -39,17 +42,29 @@ class Images:
         def load(name: str) -> pg.Surface:
             return pg.image.load(IMAGES_DIR / name).convert_alpha()
 
+        # tiles
         self.floor = load("floor.png")
         self.wall = load("wall.png")
         self.door_north = load("door_north.png")
         self.door_east = load("door_east.png")
         self.door_south = load("door_south.png")
         self.door_west = load("door_west.png")
+        self.entrance = load("entrance.png")
+
+        # entities
+        self.player = load("player.png")
 
 
 class Sounds:
     def __init__(self) -> None:
         pass
+
+
+# Load lore
+with open(LORE_DIR / "tiles.json") as f:
+    TILE_PROPERTIES: dict[TileType, TileProperties] = {
+        tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
+    }
 
 
 class Assets:

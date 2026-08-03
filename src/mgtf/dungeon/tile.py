@@ -19,6 +19,14 @@
 
 from enum import StrEnum
 
+from dataclasses import dataclass
+
+
+@dataclass(kw_only=True)
+class TileProperties:
+    solid: bool = False
+    opaque: bool = False
+
 
 class TileType(StrEnum):
     # these must match the tile type keys in `assets/lore/tiles.json`

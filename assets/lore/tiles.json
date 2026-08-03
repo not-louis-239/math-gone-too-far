@@ -7,5 +7,6 @@
     "door": {
         "solid": true,
         "opaque": true
-    }
+    },
+    "entrance": {}
 }
