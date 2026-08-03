@@ -26,9 +26,9 @@ import pygame as pg
 
 class Hitbox:
     def __init__(self, w: float, h: float, d: float) -> None:
-        self.w = w  # x
-        self.h = h  # y
-        self.d = d  # z
+        self.w = w  # width, x
+        self.h = h  # height, y
+        self.d = d  # depth, z
 
     def __iter__(self) -> Iterator[float]:
         yield self.w

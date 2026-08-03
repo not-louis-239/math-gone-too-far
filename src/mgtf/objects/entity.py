@@ -29,3 +29,27 @@ class Entity:
         self.pos: pg.Vector3 = pg.Vector3(pos[0], pos[1], pos[2])
         self.image = image
         self.hitbox = hitbox
+
+    @property
+    def left(self) -> float:
+        return self.pos.x - self.hitbox.w / 2
+
+    @property
+    def right(self) -> float:
+        return self.pos.x + self.hitbox.w / 2
+
+    @property
+    def top(self) -> float:
+        return self.pos.y + self.hitbox.h
+
+    @property
+    def bottom(self) -> float:
+        return self.pos.y
+
+    @property
+    def back(self) -> float:
+        return self.pos.z - self.hitbox.d / 2
+
+    @property
+    def front(self) -> float:
+        return self.pos.z + self.hitbox.d / 2

@@ -71,6 +71,9 @@ class GameState(State):
         pass
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
+        # TODO: fix the collision detection artefact where the player
+        # is randomly stopping when moving diagonally up against a wall
+
         if keys[Controls.MOVE_BACK]:
             self.player.pos.z -= self.player.speed * dt_s
 
@@ -97,16 +100,14 @@ class GameState(State):
                         (1, 1, 1)
                     )
                 ):
-                    if not (
-                        self.player.pos.x - self.player.hitbox.w / 2 > x + 0.5
-                        or self.player.pos.x + self.player.hitbox.w / 2 < x - 0.5
-                    ):
-                        ...
-                    if not (
-                        self.player.pos.z - self.player.hitbox.d / 2 > z + 0.5
-                        or self.player.pos.z + self.player.hitbox.d / 2 < z - 0.5
-                    ):
-                        ...
+                    x_overlap = min(abs(self.player.left - (x + 0.5)), abs(self.player.right - (x - 0.5)))
+                    z_overlap = min(abs(self.player.back - (z + 0.5)), abs(self.player.front - (z - 0.5)))
+
+                    if x_overlap > z_overlap:
+                        self.player.pos.z += self.player.speed * (1 if z < self.player.pos.z else -1) * dt_s
+                    elif z_overlap > x_overlap:
+                        self.player.pos.x += self.player.speed * (1 if x < self.player.pos.x else -1) * dt_s
+                    print(f"{x_overlap = }, {z_overlap = }")
 
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
