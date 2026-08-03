@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 from mgtf.core.utils import chance
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.tile import TileType, TileFacing
+from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.constants import (
     MIN_AREA_COEFF,
     ROOM_SPAWN_COEFF,
@@ -38,6 +38,7 @@ from mgtf.dungeon.constants import (
     DUNGEON_W,
     DUNGEON_H
 )
+from mgtf.objects.entity import Facing
 
 
 _DIRS = ((1, 0), (0, 1), (-1, 0), (0, -1))
@@ -217,7 +218,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
     # Make doors in the rooms
     for room in rooms:
         # Upper and lower edge
-        for y, facing in ((room.top - 1, TileFacing.NORTH), (room.top + room.height, TileFacing.SOUTH)):
+        for y, facing in ((room.top - 1, Facing.NORTH), (room.top + room.height, Facing.SOUTH)):
             if 0 <= y < height:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
@@ -238,7 +239,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                         chain.clear()
 
         # Left and right edge
-        for x, facing in ((room.left - 1, TileFacing.WEST), (room.left + room.width, TileFacing.EAST)):
+        for x, facing in ((room.left - 1, Facing.WEST), (room.left + room.width, Facing.EAST)):
             if 0 <= x < width:
                 # Generate doors
                 chain: list[tuple[int, int]] = []

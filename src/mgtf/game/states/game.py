@@ -24,12 +24,14 @@ import pygame as pg
 from pygame import Surface, Event
 from pygame.key import ScancodeWrapper
 
+from mgtf.objects.entity import Facing
+
 from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
-from mgtf.objects.hitbox import collides
+from mgtf.objects.entity import collides
 from mgtf.dungeon.generator import generate_dungeon
-from mgtf.dungeon.tile import TileType, TileFacing
+from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
 from mgtf.core.asset_manager import TILE_PROPERTIES
@@ -73,9 +75,6 @@ class GameState(State):
         pass
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
-        # TODO: fix the collision detection artefact where the player
-        # is randomly stopping when moving diagonally up against a wall
-
         if keys[Controls.MOVE_BACK]:
             target_pos = (self.player.pos.x, self.player.pos.z - self.player.speed * dt_s)
             if self.current_floor.is_vacant(target_pos, self.player.hitbox):
@@ -131,21 +130,21 @@ class GameState(State):
                 elif tile.typ == TileType.DOOR:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if not tile.activated:
-                        if tile.facing == TileFacing.NORTH:
+                        if tile.facing == Facing.NORTH:
                             image = self.game.assets.images.door_north
-                        elif tile.facing == TileFacing.EAST:
+                        elif tile.facing == Facing.EAST:
                             image = self.game.assets.images.door_east
-                        elif tile.facing == TileFacing.SOUTH:
+                        elif tile.facing == Facing.SOUTH:
                             image = self.game.assets.images.door_south
                         else:
                             image = self.game.assets.images.door_west
                     else:
                         # DEBUG placeholder for activated doors
-                        if tile.facing == TileFacing.NORTH:
+                        if tile.facing == Facing.NORTH:
                             image = self.game.assets.images.door_north
-                        elif tile.facing == TileFacing.EAST:
+                        elif tile.facing == Facing.EAST:
                             image = self.game.assets.images.door_east
-                        elif tile.facing == TileFacing.SOUTH:
+                        elif tile.facing == Facing.SOUTH:
                             image = self.game.assets.images.door_south
                         else:
                             image = self.game.assets.images.door_west

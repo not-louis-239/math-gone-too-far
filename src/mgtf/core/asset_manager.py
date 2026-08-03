@@ -23,6 +23,7 @@ import pygame as pg
 
 from mgtf.core.paths import FONTS_DIR, IMAGES_DIR, LORE_DIR
 from mgtf.dungeon.tile import TileProperties, TileType
+from mgtf.objects.entity import Facing
 
 
 class Fonts:
@@ -52,7 +53,9 @@ class Images:
         self.entrance = load("entrance.png")
 
         # entities
-        self.player = load("player.png")
+        self.player: dict[Facing, pg.Surface] = {
+            Facing.NORTH: load("player_north.png")
+        }
 
 
 class Sounds:

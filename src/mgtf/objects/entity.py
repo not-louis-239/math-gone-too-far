@@ -19,9 +19,23 @@
 
 
 
+from enum import StrEnum
+from typing import Iterator
+
 import pygame as pg
 
-from mgtf.objects.hitbox import Hitbox
+
+
+class Hitbox:
+    def __init__(self, w: float, h: float, d: float) -> None:
+        self.w = w  # width, x
+        self.h = h  # height, y
+        self.d = d  # depth, z
+
+    def __iter__(self) -> Iterator[float]:
+        yield self.w
+        yield self.h
+        yield self.d
 
 
 class Entity:
@@ -53,3 +67,34 @@ class Entity:
     @property
     def front(self) -> float:
         return self.pos.z + self.hitbox.d / 2
+
+
+class Facing(StrEnum):
+    NORTH = "n"
+    EAST = "e"
+    SOUTH = "s"
+    WEST = "w"
+
+
+def collides(
+        point1: tuple[float, float, float] | pg.Vector3,
+        hit1: tuple[float, float, float] | Hitbox,
+        point2: tuple[float, float, float] | pg.Vector3,
+        hit2: tuple[float, float, float] | Hitbox
+    ) -> bool:
+    """Determine collision between two point and hitbox pairs.
+    Assumes that hit1's bottom-centre is positioned at point1, and same for hit2."""
+
+    x1, y1, z1 = point1
+    w1, h1, d1 = hit1
+    x2, y2, z2 = point2
+    w2, h2, d2 = hit2
+
+    return not (
+        x1 + w1 / 2 < x2 - w2 / 2
+        or x1 - w1 / 2 > x2 + w2 / 2
+        or y1 + h1 < y2 - h2
+        or y1 - h1 > y2 + h2
+        or z1 + d1 / 2 < z2 - d2 / 2
+        or z1 - d1 / 2 > z2 + d2 / 2
+    )

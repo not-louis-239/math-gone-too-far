@@ -21,7 +21,7 @@ from typing import overload, Iterator
 
 from mgtf.core.asset_manager import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileType
-from mgtf.objects.hitbox import Hitbox
+from mgtf.objects.entity import Hitbox
 
 
 class Dungeon:

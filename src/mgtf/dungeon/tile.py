@@ -21,6 +21,8 @@ from enum import StrEnum
 
 from dataclasses import dataclass
 
+from mgtf.objects.entity import Facing
+
 
 @dataclass(kw_only=True)
 class TileProperties:
@@ -36,18 +38,11 @@ class TileType(StrEnum):
     DOOR = "door"
 
 
-class TileFacing(StrEnum):
-    NORTH = "n"
-    EAST = "e"
-    SOUTH = "s"
-    WEST = "w"
-
-
 class Tile:
     def __init__(self, typ: TileType) -> None:
         self.typ = typ
         self.explored: bool = False
 
         self.activated: bool = False
-        self.facing: TileFacing = TileFacing.SOUTH
+        self.facing: Facing = Facing.SOUTH
         self.flipped: bool = False

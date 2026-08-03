@@ -20,7 +20,7 @@
 from pygame import Surface
 
 from mgtf.objects.entity import Entity
-from mgtf.objects.hitbox import Hitbox
+from mgtf.objects.entity import Hitbox
 
 
 PLAYER_HITBOX = Hitbox(38 / 48, 75 / 48, 8 / 48)
