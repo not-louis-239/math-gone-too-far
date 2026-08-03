@@ -283,7 +283,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
     for y in range(height):
         for x in range(width):
             if (x, y) in chosen:
-                final_dungeon[x, y].typ = dungeon[x, y].typ
+                final_dungeon[x, y] = dungeon[x, y]
 
     return final_dungeon
 

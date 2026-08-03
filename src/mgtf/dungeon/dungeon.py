@@ -37,6 +37,9 @@ class Dungeon:
             return self.tiles[key]
         return self.tiles[key[1]][key[0]]
 
+    def __setitem__(self, key: tuple[int, int], value: Tile):
+        self.tiles[key[1]][key[0]] = value
+
     def __iter__(self) -> Iterator[list[Tile]]:
         for row in self.tiles:
             yield row
