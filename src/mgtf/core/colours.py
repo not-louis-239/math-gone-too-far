@@ -32,3 +32,8 @@ FG_BUTTON_HOVER: Colour = (14, 204, 128)
 
 FG_ERROR: Colour = (255, 108, 108)
 FG_WIN: Colour = (255, 210, 0)
+
+DIAG_FG: Colour = (255, 255, 255)
+DIAG_HITBOX_TOP: Colour = (0, 255, 255)
+DIAG_HITBOX_FRONT: Colour = (255, 255, 0)
+DIAG_HITBOX_BOTTOM: Colour = (255, 0, 255)

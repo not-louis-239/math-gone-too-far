@@ -23,8 +23,10 @@ from mgtf.dungeon.tile import Tile, TileType
 
 
 class Dungeon:
-    def __init__(self, width: int, height: int) -> None:
-        self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(height)]
+    def __init__(self, width: int, depth: int) -> None:
+        self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(depth)]
+        self.width = width
+        self.depth = depth
 
     @overload
     def __getitem__(self, key: int) -> list[Tile]: ...

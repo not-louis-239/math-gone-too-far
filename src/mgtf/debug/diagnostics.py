@@ -139,10 +139,10 @@ class Diagnostics:
     def _draw_fps_lines(self, surface: pg.Surface) -> None:
         for fps_count in FPS_LINES:
             line_h = WN_H - GRAPH_HEIGHT_PER_S / fps_count
-            pg.draw.line(surface, (255, 255, 255), (0, line_h), (WN_W, line_h))
+            pg.draw.line(surface, cols.DIAG_FG, (0, line_h), (WN_W, line_h))
 
             label = f"{fps_count} fps"
-            label_surf = self.fps_graph_font.render(label, True, (255, 255, 255))
+            label_surf = self.fps_graph_font.render(label, True, cols.DIAG_FG)
             surface.blit(label_surf, (0, line_h))
 
     def draw_fps_diagnostic(self, surface: pg.Surface) -> None:
@@ -156,23 +156,26 @@ class Diagnostics:
 
         # Draw mouse cross
         cross_size = 8
-        cross_colour = (255, 255, 255)
+        cross_colour = cols.DIAG_FG
         pg.draw.line(
             wn, cross_colour,
             (mx - cross_size, my),
-            (mx + cross_size, my), 1
+            (mx + cross_size, my), 3
         )
         pg.draw.line(
             wn, cross_colour,
             (mx, my - cross_size),
-            (mx, my + cross_size), 1
+            (mx, my + cross_size), 3
         )
+
+        pg.draw.line(wn, cross_colour, (WN_W // 2, 0), (WN_W // 2, WN_H), 1)
+        pg.draw.line(wn, cross_colour, (0, WN_H // 2), (WN_W, WN_H // 2), 1)
 
         # Show label (auto-align to stay onscreen)
         label = f"{mx}, {my}"
         offset = 10
 
-        label_surf = self.mouse_pos_display_font.render(label, True, (255, 255, 255))
+        label_surf = self.mouse_pos_display_font.render(label, True, cols.DIAG_FG)
         text_w, text_h = label_surf.get_size()
 
         x = mx + offset

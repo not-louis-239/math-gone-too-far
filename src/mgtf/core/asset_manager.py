@@ -63,7 +63,7 @@ class Lore:
     def __init__(self) -> None:
         with open(LORE_DIR / "tiles.json") as f:
             self.tile_properties: dict[TileType, TileProperties] = {
-                tile_type: TileProperties(**properties) for tile_type, properties in json.load(f)
+                tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
             }
 
 
@@ -72,3 +72,4 @@ class Assets:
         self.fonts = Fonts()
         self.images = Images()
         self.sounds = Sounds()
+        self.lore = Lore()

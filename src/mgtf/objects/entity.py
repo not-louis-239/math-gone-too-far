@@ -29,13 +29,3 @@ class Entity:
         self.pos: pg.Vector3 = pg.Vector3(pos[0], pos[1], pos[2])
         self.image = image
         self.hitbox = hitbox
-
-    def collides(self, other: Entity) -> bool:
-        return not (
-            self.pos.x + self.hitbox.w / 2 < other.pos.x - other.hitbox.w / 2
-            or self.pos.x - self.hitbox.w / 2 > other.pos.x + other.hitbox.w / 2
-            or self.pos.y + self.hitbox.h / 2 < other.pos.y - other.hitbox.h / 2
-            or self.pos.y - self.hitbox.h / 2 > other.pos.y + other.hitbox.h / 2
-            or self.pos.z + self.hitbox.d / 2 < other.pos.z - other.hitbox.d / 2
-            or self.pos.z - self.hitbox.d / 2 > other.pos.z + other.hitbox.d / 2
-        )

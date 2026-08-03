@@ -18,17 +18,21 @@
 
 
 import math
+import random
 from typing import TYPE_CHECKING
 
+import pygame as pg
 from pygame import Surface, Event
 from pygame.key import ScancodeWrapper
 
 from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
+from mgtf.objects.hitbox import collides
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
+from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
 from mgtf.objects.player import Player
 from mgtf.core.constants import (
     TILE_WIDTH,
@@ -48,10 +52,14 @@ class GameState(State):
     def __init__(self, game: Game) -> None:
         super().__init__(game)
 
-        self.player = Player((0, 0, 0), self.game.assets.images.player)
+        self.player = Player((random.randint(0, DUNGEON_W), 0, random.randint(0, DUNGEON_H)), self.game.assets.images.player)
         self.floor = 1
 
         self.reset()
+
+    @property
+    def current_floor(self) -> Dungeon:
+        return self.dungeon_levels[self.floor]
 
     def reset(self) -> None:
         self.dungeon_levels: dict[int, Dungeon] = {1: generate_dungeon()}  # {floor: dungeon}
@@ -70,21 +78,36 @@ class GameState(State):
         if keys[Controls.MOVE_RIGHT]:
             self.player.pos.x += self.player.speed * dt_s
 
+        # if the player is touching a wall, push them away from the wall
+        for x in range(max(0, math.floor(self.player.pos.x) - 2), min(DUNGEON_W, math.floor(self.player.pos.x) + 3)):
+            for z in range(max(0, math.floor(self.player.pos.z) - 2), min(DUNGEON_H, math.floor(self.player.pos.z) + 3)):
+                tile = self.current_floor[x, z]
+                if (
+                    self.game.assets.lore.tile_properties[tile.typ].solid
+                    and collides(
+                        self.player.pos,
+                        self.player.hitbox,
+                        (x, 0, z),
+                        (1, 1, 1)
+                    )
+                ):
+                    print((x, 0, z))
+                    print(self.player.pos)
+                    self.player.pos.move_towards_ip((x, 0, z), -self.player.speed * dt_s)
+
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
         all_entities = [self.player]
 
-        current_floor = self.dungeon_levels[self.floor]
-
-        render_left = math.floor(self.player.pos.x) - RENDER_DISTANCE_X
-        render_right = math.floor(self.player.pos.x) + RENDER_DISTANCE_X
-        render_back = math.floor(self.player.pos.z) - RENDER_DISTANCE_Z
-        render_front = math.floor(self.player.pos.z) + RENDER_DISTANCE_Z
+        render_left = max(0, math.floor(self.player.pos.x) - RENDER_DISTANCE_X)
+        render_right = min(DUNGEON_W - 1, math.floor(self.player.pos.x) + RENDER_DISTANCE_X)
+        render_back = max(0, math.floor(self.player.pos.z) - RENDER_DISTANCE_Z)
+        render_front = min(DUNGEON_H - 1, math.floor(self.player.pos.z) + RENDER_DISTANCE_Z)
 
         for z in range(render_back, render_front + 1):
             # Draw tiles first
             for x in range(render_left, render_right + 1):
-                tile = current_floor[x, z]
+                tile = self.current_floor[x, z]
 
                 tile_left = SCREEN_CENTRE_X + (x - self.player.pos.x - 0.5) * TILE_WIDTH
                 tile_top = SCREEN_CENTRE_Z + (z - self.player.pos.z - 1) * TILE_DEPTH - self.player.pos.y * TILE_HEIGHT
@@ -102,8 +125,12 @@ class GameState(State):
 
                 surface.blit(image, (tile_left, tile_top))
 
-            # Draw entities infront
-            for entity in (e for e in all_entities if z - 1 < e.pos.z < z):
-                entity_left = SCREEN_CENTRE_X + (entity.pos.x - self.player.pos.x - 0.5) * TILE_WIDTH
-                entity_top = SCREEN_CENTRE_Z + (entity.pos.z - self.player.pos.z - 1) * TILE_DEPTH
+            for entity in (e for e in all_entities if z - 0.5 <= e.pos.z < z + 0.5):
+                entity_top = SCREEN_CENTRE_Z + (entity.pos.z - self.player.pos.z - entity.hitbox.d / 2) * TILE_DEPTH - entity.hitbox.h * TILE_HEIGHT
+                entity_left = SCREEN_CENTRE_X + (entity.pos.x - self.player.pos.x - entity.hitbox.w / 2) * TILE_WIDTH
                 surface.blit(entity.image, (entity_left, entity_top))
+
+                if self.game.diagnostics.enabled:
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_left, entity_top, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_left, entity_top + TILE_HEIGHT * entity.hitbox.h, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_left, entity_top + TILE_DEPTH * entity.hitbox.d, entity.hitbox.w * TILE_WIDTH, entity.hitbox.h * TILE_HEIGHT), width=2)

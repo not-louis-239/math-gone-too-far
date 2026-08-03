@@ -23,10 +23,10 @@ import json
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass(kw_only=True)
 class TileProperties:
-    solid: bool
-    opaque: bool
+    solid: bool = False
+    opaque: bool = False
 
 
 class TileType(StrEnum):
