@@ -19,6 +19,7 @@
 
 import time
 import math
+from statistics import mean
 from dataclasses import dataclass
 
 import pygame as pg
@@ -88,6 +89,7 @@ class Diagnostics:
         self.enabled = False
         self.snapshot_container = SnapshotContainer()
         self.fps_graph_font = pg.font.Font(assets.fonts.base_font_path, 25)
+        self.fps_graph_font_small = pg.font.Font(assets.fonts.base_font_path, 16)
         self.mouse_pos_display_font = pg.font.Font(assets.fonts.base_font_path, 20)
 
         self.fps_graph_bg_surface = pg.Surface((WN_W, _MAX_GRAPH_H), pg.SRCALPHA)
@@ -123,18 +125,32 @@ class Diagnostics:
 
         # minimum
         min_dur = min(all_durs, default=0.0)
-        text_surf = get_text_surf(self.fps_graph_font, f"{min_dur * 1000:.2f} ms min", cols.FG)
+        text_surf = get_text_surf(self.fps_graph_font, f"{min_dur * 1000:,.2f} ms min", cols.FG)
         surface.blit(text_surf, text_surf.get_rect(centerx=WN_W // 2 - 240, top=WN_H - _MAX_GRAPH_H + 10))
 
         # average
         avg_dur = sum(all_durs) / len(all_durs) if all_durs else 0.0
-        text_surf = get_text_surf(self.fps_graph_font, f"{avg_dur * 1000:.2f} ms avg", cols.FG)
+        text_surf = get_text_surf(self.fps_graph_font, f"{avg_dur * 1000:,.2f} ms avg", cols.FG)
         surface.blit(text_surf, text_surf.get_rect(centerx=WN_W // 2, top=WN_H - _MAX_GRAPH_H + 10))
 
         # maximum
         max_dur = max(all_durs, default=0.0)
-        text_surf = get_text_surf(self.fps_graph_font, f"{max_dur * 1000:.2f} ms max", cols.FG)
+        text_surf = get_text_surf(self.fps_graph_font, f"{max_dur * 1000:,.2f} ms max", cols.FG)
         surface.blit(text_surf, text_surf.get_rect(centerx=WN_W // 2 + 240, top=WN_H - _MAX_GRAPH_H + 10))
+
+        # show averages for each component
+        update_avg = mean([snapshot.intervals[0].duration for snapshot in self.snapshot_container.snapshots])
+        input_avg = mean([snapshot.intervals[1].duration for snapshot in self.snapshot_container.snapshots])
+        draw_avg = mean([snapshot.intervals[2].duration for snapshot in self.snapshot_container.snapshots])
+
+        for avg, label, colour, y_pos in (
+            (update_avg, "update", COL_UPDATE, WN_H - _MAX_GRAPH_H - 45),
+            (input_avg, "input", COL_INPUT, WN_H - _MAX_GRAPH_H - 25),
+            (draw_avg, "draw", col_draw, WN_H - _MAX_GRAPH_H - 5),
+        ):
+            text_surf = get_text_surf(self.fps_graph_font_small, f"{label}: {avg * 1000:,.3g} ms avg", colour)
+            surface.blit(text_surf, text_surf.get_rect(bottom=y_pos, left=10))
+
 
     def _draw_fps_lines(self, surface: pg.Surface) -> None:
         for fps_count in FPS_LINES:
