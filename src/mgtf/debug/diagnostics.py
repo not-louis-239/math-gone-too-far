@@ -70,7 +70,7 @@ class SnapshotContainer:
     def record(self, *times: float) -> None:
         if len(times) < 2:
             raise ValueError("must provide at least two times")
-        self.snapshots.append(Snapshot([Interval(t_i=times[idx], t_f=times[idx]) for idx in range(len(times) - 1)]))
+        self.snapshots.append(Snapshot([Interval(t_i=times[idx], t_f=times[idx + 1]) for idx in range(len(times) - 1)]))
 
     def prune(self, max_len: int = MAX_HISTORY_LEN) -> None:
         self.snapshots = self.snapshots[-max_len:]
@@ -115,7 +115,7 @@ class Diagnostics:
             for interval, colour in zip(snapshot.intervals, colours):
                 bar_h = math.ceil(GRAPH_HEIGHT_PER_S * interval.duration)
                 bar_y -= bar_h
-                rect = pg.Rect(i * _BAR_WIDTH, bar_y, _BAR_WIDTH, bar_h)
+                rect = pg.Rect(math.ceil(i * _BAR_WIDTH), bar_y, math.ceil(_BAR_WIDTH), bar_h)
                 pg.draw.rect(surface, colour, rect)
 
 
