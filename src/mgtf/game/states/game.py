@@ -92,7 +92,7 @@ class GameState(State):
                 self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_RIGHT]:
-            target_pos = (self.player.pos.x - self.player.speed * dt_s, self.player.pos.z)
+            target_pos = (self.player.pos.x + self.player.speed * dt_s, self.player.pos.z)
             if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
@@ -124,7 +124,9 @@ class GameState(State):
                 tile_left = SCREEN_CENTRE_X + (x - self.player.pos.x - 0.5) * TILE_WIDTH
                 tile_top = SCREEN_CENTRE_Z + (z - self.player.pos.z - 0.5) * TILE_DEPTH - TILE_HEIGHT
 
-                if tile.typ == TileType.WALL:
+                if (x, z) == self.current_floor.entrance_pos:
+                    image = self.game.assets.images.entrance
+                elif tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
                 elif tile.typ == TileType.DOOR:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))

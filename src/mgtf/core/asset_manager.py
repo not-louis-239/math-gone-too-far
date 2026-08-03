@@ -49,6 +49,7 @@ class Images:
         self.door_east = load("door_east.png")
         self.door_south = load("door_south.png")
         self.door_west = load("door_west.png")
+        self.entrance = load("entrance.png")
 
         # entities
         self.player = load("player.png")
