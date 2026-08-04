@@ -124,7 +124,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
     dungeon = Dungeon(width, height)
     dungeon_area = width * height
     dungeon_centre_x, dungeon_centre_y = width // 2, height // 2
-    room_spawn_radius_sq = min(width // 2, height // 2) ** 2
+    room_spawn_radius_sq = min(width // 2, height // 2) ** 2 - 1  # -1 to prevent rooms spawning on the edge
 
     num_room_spawn_attempts = int(dungeon_area * ROOM_SPAWN_COEFF)
 
@@ -292,13 +292,6 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
         for x in range(width):
             if (x, y) in chosen_fill:
                 final_dungeon[x, y] = dungeon[x, y]
-
-    # Add a row of solid tiles on each side so that the dungeon is sealed off
-    final_dungeon.tiles.insert(0, [Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
-    final_dungeon.tiles.insert(-1, [Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
-    for row in final_dungeon:
-        row.insert(0, Tile(typ=TileType.WALL))
-        row.insert(-1, Tile(typ=TileType.WALL))
 
     # Get all the rooms that are still there after cutting off unreachable areas
     rooms = [r for r in rooms if (r.left, r.top) in chosen_fill]
