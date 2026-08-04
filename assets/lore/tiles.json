@@ -4,9 +4,10 @@
         "solid": true,
         "opaque": true
     },
-    "door": {
+    "door_closed": {
         "solid": true,
         "opaque": true
     },
+    "door_open": {},
     "entrance": {}
 }

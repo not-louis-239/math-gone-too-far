@@ -26,6 +26,11 @@ import pygame as pg
 from mgtf.objects.entity import Facing, Hitbox
 
 
+DOOR_W = 1
+DOOR_H = 1
+DOOR_D = 4 / 48
+
+
 @dataclass(kw_only=True)
 class TileProperties:
     solid: bool = False
@@ -37,16 +42,28 @@ class TileType(StrEnum):
 
     EMPTY = "empty"
     WALL = "wall"
-    DOOR = "door"
+    DOOR_CLOSED = "door_closed"
+    DOOR_OPEN = "door_open"
 
 
 class Tile:
     def __init__(self, typ: TileType) -> None:
         self.typ = typ
         self.explored: bool = False
-        self.hitbox_offset: pg.Vector3 = pg.Vector3()
-        self.hitbox: Hitbox = Hitbox(1, 1, 1)
-
-        self.activated: bool = False
         self.facing: Facing = Facing.SOUTH
         self.flipped: bool = False
+
+    def get_hitbox_info(self) -> tuple[pg.Vector3, Hitbox]:
+        """Returns (hitbox_offset, hitbox)"""
+
+        if self.typ == TileType.DOOR_CLOSED:
+            if self.facing == Facing.NORTH:
+                return pg.Vector3(0, 0, -0.5 + DOOR_D / 2), Hitbox(DOOR_W, DOOR_H, DOOR_D)
+            elif self.facing == Facing.SOUTH:
+                return pg.Vector3(0, 0, 0.5 - DOOR_D / 2), Hitbox(DOOR_W, DOOR_H, DOOR_D)
+            elif self.facing == Facing.WEST:
+                return pg.Vector3(-0.5 + DOOR_D / 2, 0, 0), Hitbox(DOOR_D, DOOR_H, DOOR_W)
+            else:
+                return pg.Vector3(0.5 - DOOR_D / 2, 0, 0), Hitbox(DOOR_D, DOOR_H, DOOR_W)
+
+        return pg.Vector3(), Hitbox(1, 1, 1)

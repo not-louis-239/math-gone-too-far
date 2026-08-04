@@ -227,15 +227,18 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
-                            dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[0]].flipped = chance(0.5)
                             dungeon[chain[0]].facing = facing
+
                         elif len(chain) == 2:
-                            dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[0]].flipped = True
                             dungeon[chain[0]].facing = facing
-                            dungeon[chain[1]].typ = TileType.DOOR
+
+                            dungeon[chain[1]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[1]].facing = facing
+
                         chain.clear()
 
         # Left and right edge
@@ -248,15 +251,18 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
-                            dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[0]].flipped = chance(0.5)
                             dungeon[chain[0]].facing = facing
+
                         elif len(chain) == 2:
-                            dungeon[chain[0]].typ = TileType.DOOR
+                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[0]].flipped = True
                             dungeon[chain[0]].facing = facing
-                            dungeon[chain[1]].typ = TileType.DOOR
+
+                            dungeon[chain[1]].typ = TileType.DOOR_CLOSED
                             dungeon[chain[1]].facing = facing
+
                         chain.clear()
 
     # Find the empty space that has the most unbroken area, and use that

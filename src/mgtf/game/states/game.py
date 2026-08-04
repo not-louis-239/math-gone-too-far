@@ -34,7 +34,6 @@ from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
-from mgtf.core.asset_manager import TILE_PROPERTIES
 from mgtf.objects.player import Player, PLAYER_HITBOX
 from mgtf.core.constants import (
     TILE_WIDTH,
@@ -128,33 +127,22 @@ class GameState(State):
                 ):
                     continue
 
-                tile_left, tile_top = self._world_to_screen_pos((x - tile.hitbox.w / 2, tile.hitbox.h, z - tile.hitbox.d / 2))
+                tile_left, tile_top = self._world_to_screen_pos((x - 0.5, 1, z - 0.5))
 
                 if (x, z) == self.current_floor.entrance_pos:
                     image = self.game.assets.images.entrance
                 elif tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
-                elif tile.typ == TileType.DOOR:
+                elif tile.typ == TileType.DOOR_CLOSED:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
-                    if not tile.activated:
-                        if tile.facing == Facing.NORTH:
-                            image = self.game.assets.images.door_north
-                        elif tile.facing == Facing.EAST:
-                            image = self.game.assets.images.door_east
-                        elif tile.facing == Facing.SOUTH:
-                            image = self.game.assets.images.door_south
-                        else:
-                            image = self.game.assets.images.door_west
+                    if tile.facing == Facing.NORTH:
+                        image = self.game.assets.images.door_north
+                    elif tile.facing == Facing.EAST:
+                        image = self.game.assets.images.door_east
+                    elif tile.facing == Facing.SOUTH:
+                        image = self.game.assets.images.door_south
                     else:
-                        # DEBUG placeholder for activated doors
-                        if tile.facing == Facing.NORTH:
-                            image = self.game.assets.images.door_north
-                        elif tile.facing == Facing.EAST:
-                            image = self.game.assets.images.door_east
-                        elif tile.facing == Facing.SOUTH:
-                            image = self.game.assets.images.door_south
-                        else:
-                            image = self.game.assets.images.door_west
+                        image = self.game.assets.images.door_west
 
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
@@ -177,5 +165,5 @@ class GameState(State):
         if self.game.diagnostics.enabled:
             for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                 nx, nz = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
-                tile_left, tile_top = self._world_to_screen_pos((nx - 0.5, tile.hitbox.h, nz - 0.5))
+                tile_left, tile_top = self._world_to_screen_pos((nx - 0.5, 0, nz - 0.5))
                 pg.draw.rect(surface, cols.DIAG_TILE_NEIGHBOURS, (tile_left, tile_top, TILE_WIDTH, TILE_HEIGHT), width=2)

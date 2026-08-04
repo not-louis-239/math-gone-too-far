@@ -19,7 +19,7 @@
 
 from typing import overload, Iterator
 
-from mgtf.core.asset_manager import TILE_PROPERTIES
+from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileType
 from mgtf.objects.entity import Hitbox
 
@@ -58,13 +58,15 @@ class Dungeon:
         for tx in range(round(px) - 1, round(px) + 2):
             for tz in range(round(pz) - 1, round(pz) + 2):
                 tile = self[tx, tz]
+                t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
+
                 if (
                     TILE_PROPERTIES[tile.typ].solid
                     and not (
-                        left > tx + tile.hitbox_offset.x + tile.hitbox.w / 2
-                        or right < tx + tile.hitbox_offset.x - tile.hitbox.w / 2
-                        or back > tz + tile.hitbox_offset.z + tile.hitbox.d / 2
-                        or front < tz + tile.hitbox_offset.z - tile.hitbox.d / 2
+                        left > tx + t_hitbox_offset.x + t_hitbox.w / 2
+                        or right < tx + t_hitbox_offset.x - t_hitbox.w / 2
+                        or back > tz + t_hitbox_offset.z + t_hitbox.d / 2
+                        or front < tz + t_hitbox_offset.z - t_hitbox.d / 2
                     )
                 ):
                     return False

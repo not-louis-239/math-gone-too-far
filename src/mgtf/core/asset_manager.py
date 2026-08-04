@@ -17,12 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import json
 
 import pygame as pg
 
 from mgtf.core.paths import FONTS_DIR, IMAGES_DIR, LORE_DIR
-from mgtf.dungeon.tile import TileProperties, TileType
 from mgtf.objects.entity import Facing
 
 
@@ -67,12 +65,6 @@ class Sounds:
 
 
 # Load lore
-with open(LORE_DIR / "tiles.json") as f:
-    TILE_PROPERTIES: dict[TileType, TileProperties] = {
-        tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
-    }
-
-
 class Assets:
     def __init__(self) -> None:
         self.fonts = Fonts()
