@@ -54,7 +54,7 @@ class Tile:
         self.flipped: bool = False
 
     def get_hitbox_info(self) -> tuple[pg.Vector3, Hitbox]:
-        """Returns (hitbox_offset, hitbox)"""
+        """Returns (hitbox_offset_from_centre, hitbox)"""
 
         if self.typ == TileType.DOOR_CLOSED:
             if self.facing == Facing.NORTH:

@@ -29,12 +29,12 @@ from mgtf.objects.entity import Facing
 from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
-from mgtf.objects.entity import collides
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
 from mgtf.objects.player import Player, PLAYER_HITBOX
+from mgtf.objects.entity import Entity
 from mgtf.core.constants import (
     TILE_WIDTH,
     TILE_DEPTH,
@@ -111,13 +111,17 @@ class GameState(State):
         render_back = max(0, round(self.player.pos.z) - RENDER_DISTANCE_Z)
         render_front = min(DUNGEON_H - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z + 1)
 
+        # Pick render elements to draw
+        render_elems: list[tuple[tuple[int, int] | Entity, float]] = []
+
         for z in range(render_back, render_front + 1):
             # Draw tiles first
             for x in range(render_left, render_right + 1):
-                tile = self.current_floor[x, z]
-
                 # Skip rendering wall tiles that are entirely surrounded by walls
-                if (
+                tile = self.current_floor[x, z]
+                t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
+
+                if not (
                     tile.typ == TileType.WALL
                     and all(
                         self.current_floor[x + dx, z + dz].typ == TileType.WALL
@@ -125,8 +129,32 @@ class GameState(State):
                         if 0 <= x + dx < DUNGEON_W and 0 <= z + dz < DUNGEON_H
                     )
                 ):
-                    continue
+                    render_elems.append(((x, z), z + t_hitbox_offset.z + t_hitbox.d / 2 - (1 if tile.typ == TileType.EMPTY else 0)))
 
+        for entity in all_entities:
+            render_elems.append((entity, entity.pos.z + entity.hitbox.d / 2))
+
+        # Sort by depth
+        render_elems.sort(key=lambda elem: elem[1])
+
+        for elem in render_elems:
+            if isinstance(elem[0], Entity):
+                # It's an entity!
+                entity = elem[0]
+                entity_vis_left, entity_vis_top = self._world_to_screen_pos((entity.pos.x - entity.images[entity.facing].width / 2 / TILE_WIDTH, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
+                surface.blit(entity.images[entity.facing], (entity_vis_left, entity_vis_top))
+
+                # Show hitboxes
+                if self.game.diagnostics.enabled:
+                    entity_hit_left, entity_hit_top = self._world_to_screen_pos((entity.pos.x - entity.hitbox.w / 2, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_hit_left, entity_hit_top, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_hit_left, entity_hit_top + TILE_HEIGHT * entity.hitbox.h, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_hit_left, entity_hit_top + TILE_DEPTH * entity.hitbox.d, entity.hitbox.w * TILE_WIDTH, entity.hitbox.h * TILE_HEIGHT), width=2)
+
+            else:
+                # It's a tile!
+                x, z = elem[0]
+                tile = self.current_floor[elem[0]]
                 tile_left, tile_top = self._world_to_screen_pos((x - 0.5, 1, z - 0.5))
 
                 if (x, z) == self.current_floor.entrance_pos:
@@ -150,16 +178,6 @@ class GameState(State):
                     raise ValueError(f"unhandled tile type: '{tile.typ}'")
 
                 surface.blit(image, (tile_left, tile_top))
-
-            for entity in (e for e in all_entities if z == round(e.pos.z)):
-                entity_left, entity_top = self._world_to_screen_pos((entity.pos.x - entity.hitbox.w / 2, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
-                surface.blit(entity.images[entity.facing], (entity_left, entity_top))
-
-                # Show hitboxes
-                if self.game.diagnostics.enabled:
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_left, entity_top, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_left, entity_top + TILE_HEIGHT * entity.hitbox.h, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_left, entity_top + TILE_DEPTH * entity.hitbox.d, entity.hitbox.w * TILE_WIDTH, entity.hitbox.h * TILE_HEIGHT), width=2)
 
         # Show diagnostics for the four tiles immediately adjacent to the player
         if self.game.diagnostics.enabled:
