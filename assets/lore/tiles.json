@@ -3,7 +3,7 @@
         "map_colour": "#111118"
     },
     "wall": {
-        "map_colour": "#8181a7",
+        "map_colour": "#6f6f91",
         "solid": true,
         "opaque": true
     },

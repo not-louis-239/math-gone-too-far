@@ -29,6 +29,7 @@ from mgtf.objects.entity import Facing
 from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
+from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
@@ -51,11 +52,18 @@ if TYPE_CHECKING:
 
 NEIGHBOURS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
 
+MINIMAP_TOP = 20
+MINIMAP_LEFT = 20
+MINIMAP_TILE_SIZE = 5
+MINIMAP_SIZE = 150
+MINIMAP_PLAYER_POINTER_SIZE = 2
+
 
 class GameState(State):
     def __init__(self, game: Game) -> None:
         super().__init__(game)
 
+        self.minimap_surface = pg.Surface((MINIMAP_SIZE, MINIMAP_SIZE))
         self.player = Player((random.randint(0, DUNGEON_W), 0, random.randint(0, DUNGEON_H)), self.game.assets.images.player, PLAYER_HITBOX)
         self.floor = 1
 
@@ -64,6 +72,36 @@ class GameState(State):
     def _world_to_screen_pos(self, world_pos: tuple[float, float, float] | pg.Vector3) -> tuple[float, float]:
         wx, wy, wz = world_pos
         return SCREEN_CENTRE_X + (wx - self.player.pos.x) * TILE_WIDTH, SCREEN_CENTRE_Z + (wz - self.player.pos.z) * TILE_DEPTH - (wy - self.player.pos.y) * TILE_HEIGHT
+
+    def _draw_minimap(self, surface: pg.Surface) -> None:
+        half_size = MINIMAP_SIZE / 2
+        self.minimap_surface.fill(cols.MINIMAP_OOB)
+
+        # Determine render bounds
+        render_left = max(0, round(self.player.pos.x - half_size / MINIMAP_TILE_SIZE))
+        render_right = min(DUNGEON_W - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
+        render_back = max(0, round(self.player.pos.z - half_size / MINIMAP_TILE_SIZE))
+        render_front = min(DUNGEON_H - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
+
+        # Draw the tiles
+        for z in range(render_back, render_front + 1):
+            for x in range(render_left, render_right + 1):
+                tile = self.current_floor[x, z]
+                screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
+                pg.draw.rect(self.minimap_surface, TILE_PROPERTIES[tile.typ].map_colour, (screen_x, screen_y, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE))
+
+        # Blit the minimap surface onto the main surface
+        surface.blit(self.minimap_surface, (MINIMAP_LEFT, MINIMAP_TOP))
+
+        # Draw the player pointer
+        pg.draw.circle(surface, cols.MINIMAP_PLAYER_POINTER, (MINIMAP_LEFT + half_size, MINIMAP_TOP + half_size), 2)
+
+        # Draw the border
+        pg.draw.rect(surface, cols.MINIMAP_BORDER, (MINIMAP_LEFT, MINIMAP_TOP, MINIMAP_SIZE, MINIMAP_SIZE), width=2)
+
+
+    def _draw_hud(self, surface: Surface) -> None:
+        self._draw_minimap(surface)
 
     @property
     def current_floor(self) -> Dungeon:
@@ -185,3 +223,5 @@ class GameState(State):
                 nx, nz = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
                 tile_left, tile_top = self._world_to_screen_pos((nx - 0.5, 0, nz - 0.5))
                 pg.draw.rect(surface, cols.DIAG_TILE_NEIGHBOURS, (tile_left, tile_top, TILE_WIDTH, TILE_HEIGHT), width=2)
+
+        self._draw_hud(surface)
