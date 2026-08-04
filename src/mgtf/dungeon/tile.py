@@ -21,7 +21,9 @@ from enum import StrEnum
 
 from dataclasses import dataclass
 
-from mgtf.objects.entity import Facing
+import pygame as pg
+
+from mgtf.objects.entity import Facing, Hitbox
 
 
 @dataclass(kw_only=True)
@@ -42,6 +44,8 @@ class Tile:
     def __init__(self, typ: TileType) -> None:
         self.typ = typ
         self.explored: bool = False
+        self.hitbox_offset: pg.Vector3 = pg.Vector3()
+        self.hitbox: Hitbox = Hitbox(1, 1, 1)
 
         self.activated: bool = False
         self.facing: Facing = Facing.SOUTH

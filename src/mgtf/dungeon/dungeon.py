@@ -57,13 +57,14 @@ class Dungeon:
 
         for tx in range(round(px) - 1, round(px) + 2):
             for tz in range(round(pz) - 1, round(pz) + 2):
+                tile = self[tx, tz]
                 if (
-                    TILE_PROPERTIES[self[tx, tz].typ].solid
+                    TILE_PROPERTIES[tile.typ].solid
                     and not (
-                        left > tx + 0.5
-                        or right < tx - 0.5
-                        or back > tz + 0.5
-                        or front < tz - 0.5
+                        left > tx + tile.hitbox_offset.x + tile.hitbox.w / 2
+                        or right < tx + tile.hitbox_offset.x - tile.hitbox.w / 2
+                        or back > tz + tile.hitbox_offset.z + tile.hitbox.d / 2
+                        or front < tz + tile.hitbox_offset.z - tile.hitbox.d / 2
                     )
                 ):
                     return False

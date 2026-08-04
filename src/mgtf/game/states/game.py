@@ -62,6 +62,10 @@ class GameState(State):
 
         self.reset()
 
+    def _world_to_screen_pos(self, world_pos: tuple[float, float, float] | pg.Vector3) -> tuple[float, float]:
+        wx, wy, wz = world_pos
+        return SCREEN_CENTRE_X + (wx - self.player.pos.x) * TILE_WIDTH, SCREEN_CENTRE_Z + (wz - self.player.pos.z) * TILE_DEPTH - (wy - self.player.pos.y) * TILE_HEIGHT
+
     @property
     def current_floor(self) -> Dungeon:
         return self.dungeon_levels[self.floor]
@@ -78,25 +82,25 @@ class GameState(State):
         if keys[Controls.MOVE_BACK]:
             self.player.facing = Facing.NORTH
             target_pos = (self.player.pos.x, self.player.pos.z - self.player.speed * dt_s)
-            if self.current_floor.is_vacant(target_pos, self.player._base_hitbox):
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_FWD]:
             target_pos = (self.player.pos.x, self.player.pos.z + self.player.speed * dt_s)
             self.player.facing = Facing.SOUTH
-            if self.current_floor.is_vacant(target_pos, self.player._base_hitbox):
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_LEFT]:
             self.player.facing = Facing.WEST
             target_pos = (self.player.pos.x - self.player.speed * dt_s, self.player.pos.z)
-            if self.current_floor.is_vacant(target_pos, self.player._base_hitbox):
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
         if keys[Controls.MOVE_RIGHT]:
             self.player.facing = Facing.EAST
             target_pos = (self.player.pos.x + self.player.speed * dt_s, self.player.pos.z)
-            if self.current_floor.is_vacant(target_pos, self.player._base_hitbox):
+            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
     def draw(self, surface: Surface) -> None:
@@ -124,8 +128,7 @@ class GameState(State):
                 ):
                     continue
 
-                tile_left = SCREEN_CENTRE_X + (x - self.player.pos.x - 0.5) * TILE_WIDTH
-                tile_top = SCREEN_CENTRE_Z + (z - self.player.pos.z - 0.5) * TILE_DEPTH - TILE_HEIGHT
+                tile_left, tile_top = self._world_to_screen_pos((x - tile.hitbox.w / 2, tile.hitbox.h, z - tile.hitbox.d / 2))
 
                 if (x, z) == self.current_floor.entrance_pos:
                     image = self.game.assets.images.entrance
@@ -161,22 +164,18 @@ class GameState(State):
                 surface.blit(image, (tile_left, tile_top))
 
             for entity in (e for e in all_entities if z == round(e.pos.z)):
-                entity_top = SCREEN_CENTRE_Z + (entity.pos.z - self.player.pos.z - entity._base_hitbox.d / 2) * TILE_DEPTH - entity._base_hitbox.h * TILE_HEIGHT
-                entity_left = SCREEN_CENTRE_X + (entity.pos.x - self.player.pos.x - entity._base_hitbox.w / 2) * TILE_WIDTH
+                entity_left, entity_top = self._world_to_screen_pos((entity.pos.x - entity.hitbox.w / 2, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
                 surface.blit(entity.images[entity.facing], (entity_left, entity_top))
 
                 # Show hitboxes
                 if self.game.diagnostics.enabled:
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_left, entity_top, entity._base_hitbox.w * TILE_WIDTH, entity._base_hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_left, entity_top + TILE_HEIGHT * entity._base_hitbox.h, entity._base_hitbox.w * TILE_WIDTH, entity._base_hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_left, entity_top + TILE_DEPTH * entity._base_hitbox.d, entity._base_hitbox.w * TILE_WIDTH, entity._base_hitbox.h * TILE_HEIGHT), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_left, entity_top, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_left, entity_top + TILE_HEIGHT * entity.hitbox.h, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
+                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_left, entity_top + TILE_DEPTH * entity.hitbox.d, entity.hitbox.w * TILE_WIDTH, entity.hitbox.h * TILE_HEIGHT), width=2)
 
         # Show diagnostics for the four tiles immediately adjacent to the player
         if self.game.diagnostics.enabled:
             for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                 nx, nz = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
-
-                tile_left = SCREEN_CENTRE_X + (nx - self.player.pos.x - 0.5) * TILE_WIDTH
-                tile_top = SCREEN_CENTRE_Z + (nz - self.player.pos.z - 0.5) * TILE_DEPTH - TILE_HEIGHT
-
+                tile_left, tile_top = self._world_to_screen_pos((nx - 0.5, tile.hitbox.h, nz - 0.5))
                 pg.draw.rect(surface, cols.DIAG_TILE_NEIGHBOURS, (tile_left, tile_top, TILE_WIDTH, TILE_HEIGHT), width=2)
