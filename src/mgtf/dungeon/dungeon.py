@@ -57,11 +57,11 @@ class Dungeon:
         """Determine, given a `pos` and a `hitbox`, whether `pos` is vacant and does not overlap
         any walls."""
         px, pz = pos
-        left, right = max(1, px - hitbox.w / 2), min(self.width - 2, px + hitbox.w / 2)
-        back, front = max(1, pz - hitbox.d / 2), min(self.depth - 2, pz + hitbox.d / 2)
+        left, right = px - hitbox.w / 2, px + hitbox.w / 2
+        back, front = pz - hitbox.d / 2, pz + hitbox.d / 2
 
-        for tx in range(round(px) - 1, round(px) + 2):
-            for tz in range(round(pz) - 1, round(pz) + 2):
+        for tx in range(max(0, round(px) - 1), min(self.width, round(px) + 2)):
+            for tz in range(max(0, round(pz) - 1), min(self.depth, round(pz) + 2)):
                 tile = self[tx, tz]
                 t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
 

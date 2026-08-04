@@ -23,15 +23,15 @@ import pygame as pg
 
 
 class Controls(IntEnum):
-    MOVE_BACK = pg.K_w
-    MOVE_FWD = pg.K_s
-    MOVE_LEFT = pg.K_a
-    MOVE_RIGHT = pg.K_d
+    MOVE_BACK = pg.K_UP
+    MOVE_FWD = pg.K_DOWN
+    MOVE_LEFT = pg.K_LEFT
+    MOVE_RIGHT = pg.K_RIGHT
 
     INVENTORY = pg.K_e
     GENERIC_ESCAPE = pg.K_ESCAPE
 
-    CONFIRM = pg.K_z
-    BACK = pg.K_x
+    ATTACK = pg.K_z
+    INTERACT = pg.K_x
 
     DEBUG_TOGGLE = pg.K_F10

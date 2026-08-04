@@ -140,6 +140,22 @@ class GameState(State):
             if self.current_floor.is_vacant(target_pos, self.player.hitbox):
                 self.player.pos.x, self.player.pos.z = target_pos
 
+        for event in events:
+            if event.type == pg.KEYDOWN and event.key == Controls.INTERACT:
+                if self.player.facing == Facing.NORTH:
+                    dx, dz = 0, -1
+                elif self.player.facing == Facing.SOUTH:
+                    dx, dz = 0, 1
+                elif self.player.facing == Facing.EAST:
+                    dx, dz = 1, 0
+                elif self.player.facing == Facing.WEST:
+                    dx, dz = -1, 0
+                focused_tile_coord = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
+                if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
+                    self.current_floor[focused_tile_coord].typ = TileType.DOOR_OPEN
+                    print("Opened a door!")  # DEBUG
+                    # TODO: handle door hitboxes for opened doors
+
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
         all_entities = [self.player]
@@ -199,6 +215,8 @@ class GameState(State):
                     image = self.game.assets.images.entrance
                 elif tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
+
+                # TODO: handle visually flipped doors
                 elif tile.typ == TileType.DOOR_CLOSED:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if tile.facing == Facing.NORTH:
@@ -209,6 +227,16 @@ class GameState(State):
                         image = self.game.assets.images.door_south
                     else:
                         image = self.game.assets.images.door_west
+                elif tile.typ == TileType.DOOR_OPEN:
+                    surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
+                    if tile.facing == Facing.NORTH:
+                        image = self.game.assets.images.door_east
+                    elif tile.facing == Facing.EAST:
+                        image = self.game.assets.images.door_north
+                    elif tile.facing == Facing.SOUTH:
+                        image = self.game.assets.images.door_east
+                    else:
+                        image = self.game.assets.images.door_north
 
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
