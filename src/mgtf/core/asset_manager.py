@@ -45,8 +45,10 @@ class Images:
         self.floor = load("floor.png")
         self.wall = load("wall.png")
         self.door_north = load("door_north.png")
-        self.door_east = load("door_east.png")
+        self.door_north_flipped = pg.transform.flip(self.door_north, True, False)
         self.door_south = load("door_south.png")
+        self.door_south_flipped = pg.transform.flip(self.door_south, True, False)
+        self.door_east = load("door_east.png")
         self.door_west = load("door_west.png")
         self.entrance = load("entrance.png")
 

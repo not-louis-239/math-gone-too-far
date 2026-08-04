@@ -150,11 +150,14 @@ class GameState(State):
                     dx, dz = 1, 0
                 elif self.player.facing == Facing.WEST:
                     dx, dz = -1, 0
-                focused_tile_coord = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
-                if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
-                    self.current_floor[focused_tile_coord].typ = TileType.DOOR_OPEN
-                    print("Opened a door!")  # DEBUG
-                    # TODO: handle door hitboxes for opened doors
+
+                # Try to open the current door first, then the
+                for candidate_dx, candidate_dz in ((0, 0), (dx, dz)):
+                    focused_tile_coord = round(self.player.pos.x) + candidate_dx, round(self.player.pos.z) + candidate_dz
+                    if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
+                        self.current_floor[focused_tile_coord].typ = TileType.DOOR_OPEN
+                        # TODO: handle door hitboxes for opened doors
+                        break
 
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
@@ -216,27 +219,26 @@ class GameState(State):
                 elif tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
 
-                # TODO: handle visually flipped doors
                 elif tile.typ == TileType.DOOR_CLOSED:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if tile.facing == Facing.NORTH:
-                        image = self.game.assets.images.door_north
+                        image = self.game.assets.images.door_north_flipped if tile.flipped else self.game.assets.images.door_north
                     elif tile.facing == Facing.EAST:
                         image = self.game.assets.images.door_east
                     elif tile.facing == Facing.SOUTH:
-                        image = self.game.assets.images.door_south
+                        image = self.game.assets.images.door_south_flipped if tile.flipped else self.game.assets.images.door_south
                     else:
                         image = self.game.assets.images.door_west
                 elif tile.typ == TileType.DOOR_OPEN:
                     surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if tile.facing == Facing.NORTH:
-                        image = self.game.assets.images.door_east
+                        image = self.game.assets.images.door_west if tile.flipped else self.game.assets.images.door_east
                     elif tile.facing == Facing.EAST:
-                        image = self.game.assets.images.door_north
+                        image = self.game.assets.images.door_north if tile.flipped else self.game.assets.images.door_south
                     elif tile.facing == Facing.SOUTH:
-                        image = self.game.assets.images.door_east
+                        image = self.game.assets.images.door_west if tile.flipped else self.game.assets.images.door_east
                     else:
-                        image = self.game.assets.images.door_north
+                        image = self.game.assets.images.door_north_flipped if tile.flipped else self.game.assets.images.door_south_flipped
 
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
