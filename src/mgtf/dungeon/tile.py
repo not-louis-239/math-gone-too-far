@@ -35,6 +35,13 @@ DOOR_D = 4 / 48
 class TileProperties:
     solid: bool = False
     opaque: bool = False
+    map_colour: tuple[int, int, int]
+
+    def __post_init__(self) -> None:
+        # auto convert hex colours
+        if isinstance(self.map_colour, str):
+            map_colour = self.map_colour.strip("#")
+            self.map_colour = (int(map_colour[0:2], 16), int(map_colour[2:4], 16), int(map_colour[4:6], 16))
 
 
 class TileType(StrEnum):

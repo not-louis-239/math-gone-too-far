@@ -1,13 +1,21 @@
 {
-    "empty": {},
+    "empty": {
+        "map_colour": "#111118"
+    },
     "wall": {
+        "map_colour": "#8181a7",
         "solid": true,
         "opaque": true
     },
     "door_closed": {
+        "map_colour": "#bdb39c",
         "solid": true,
         "opaque": true
     },
-    "door_open": {},
-    "entrance": {}
+    "door_open": {
+        "map_colour": "#8c806c"
+    },
+    "entrance": {
+        "map_colour":"#00ff4c"
+    }
 }
