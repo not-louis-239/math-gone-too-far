@@ -27,10 +27,15 @@ from mgtf.objects.entity import Hitbox
 class Dungeon:
     def __init__(self, width: int, depth: int) -> None:
         self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(depth)]
-        self.width = width
-        self.depth = depth
-
         self.entrance_pos: tuple[int, int] = (0, 0)
+
+    @property
+    def width(self) -> int:
+        return len(self.tiles[0])
+
+    @property
+    def depth(self) -> int:
+        return len(self.tiles)
 
     @overload
     def __getitem__(self, key: int) -> list[Tile]: ...

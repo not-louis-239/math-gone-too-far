@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 from mgtf.core.utils import chance
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.tile import TileType
+from mgtf.dungeon.tile import Tile, TileType
 from mgtf.dungeon.constants import (
     MIN_AREA_COEFF,
     ROOM_SPAWN_COEFF,
@@ -292,6 +292,13 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
         for x in range(width):
             if (x, y) in chosen_fill:
                 final_dungeon[x, y] = dungeon[x, y]
+
+    # Add a row of solid tiles on each side so that the dungeon is sealed off
+    final_dungeon.tiles.insert(0, [Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
+    final_dungeon.tiles.insert(-1, [Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
+    for row in final_dungeon:
+        row.insert(0, Tile(typ=TileType.WALL))
+        row.insert(-1, Tile(typ=TileType.WALL))
 
     # Get all the rooms that are still there after cutting off unreachable areas
     rooms = [r for r in rooms if (r.left, r.top) in chosen_fill]
