@@ -26,9 +26,14 @@ import pygame as pg
 from mgtf.objects.entity import Facing, Hitbox
 
 
-DOOR_W = 1
-DOOR_H = 1
-DOOR_D = 4 / 48
+_DOOR_W = 1
+_DOOR_H = 1
+_DOOR_D = 4 / 48
+
+_DOOR_NORTH_HITBOX_INFO = pg.Vector3(0, 0, -0.5 + _DOOR_D / 2), Hitbox(_DOOR_W, _DOOR_H, _DOOR_D)
+_DOOR_EAST_HITBOX_INFO = pg.Vector3(0, 0, 0.5 - _DOOR_D / 2), Hitbox(_DOOR_W, _DOOR_H, _DOOR_D)
+_DOOR_SOUTH_HITBOX_INFO = pg.Vector3(-0.5 + _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
+_DOOR_WEST_HITBOX_INFO = pg.Vector3(0.5 - _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
 
 
 @dataclass(kw_only=True)
@@ -65,12 +70,22 @@ class Tile:
 
         if self.typ == TileType.DOOR_CLOSED:
             if self.facing == Facing.NORTH:
-                return pg.Vector3(0, 0, -0.5 + DOOR_D / 2), Hitbox(DOOR_W, DOOR_H, DOOR_D)
+                return _DOOR_NORTH_HITBOX_INFO
             elif self.facing == Facing.SOUTH:
-                return pg.Vector3(0, 0, 0.5 - DOOR_D / 2), Hitbox(DOOR_W, DOOR_H, DOOR_D)
+                return _DOOR_EAST_HITBOX_INFO
             elif self.facing == Facing.WEST:
-                return pg.Vector3(-0.5 + DOOR_D / 2, 0, 0), Hitbox(DOOR_D, DOOR_H, DOOR_W)
+                return _DOOR_SOUTH_HITBOX_INFO
             else:
-                return pg.Vector3(0.5 - DOOR_D / 2, 0, 0), Hitbox(DOOR_D, DOOR_H, DOOR_W)
+                return _DOOR_WEST_HITBOX_INFO
+
+        elif self.typ == TileType.DOOR_OPEN:
+            if self.facing == Facing.NORTH:
+                return _DOOR_WEST_HITBOX_INFO if self.flipped else _DOOR_EAST_HITBOX_INFO
+            elif self.facing == Facing.SOUTH:
+                return _DOOR_WEST_HITBOX_INFO if self.flipped else _DOOR_EAST_HITBOX_INFO
+            elif self.facing == Facing.WEST:
+                return _DOOR_NORTH_HITBOX_INFO if self.flipped else _DOOR_SOUTH_HITBOX_INFO
+            else:
+                return _DOOR_NORTH_HITBOX_INFO if self.flipped else _DOOR_SOUTH_HITBOX_INFO
 
         return pg.Vector3(), Hitbox(1, 1, 1)

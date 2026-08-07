@@ -34,7 +34,7 @@ from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.constants import DUNGEON_W, DUNGEON_H
+from mgtf.dungeon.constants import DUNGEON_GEN_W, DUNGEON_GEN_H
 from mgtf.objects.player import Player, PLAYER_HITBOX
 from mgtf.objects.entity import Entity
 from mgtf.core.constants import (
@@ -72,7 +72,7 @@ class GameState(State):
         super().__init__(game)
 
         self.minimap_surface = pg.Surface((MINIMAP_SIZE, MINIMAP_SIZE))
-        self.player = Player((random.randint(0, DUNGEON_W), 0, random.randint(0, DUNGEON_H)), self.game.assets.images.player, PLAYER_HITBOX)
+        self.player = Player((random.randint(0, DUNGEON_GEN_W), 0, random.randint(0, DUNGEON_GEN_H)), self.game.assets.images.player, PLAYER_HITBOX)
         self.floor = 1
 
         self.reset()
@@ -87,9 +87,9 @@ class GameState(State):
 
         # Determine render bounds
         render_left = max(0, round(self.player.pos.x - half_size / MINIMAP_TILE_SIZE))
-        render_right = min(DUNGEON_W - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
+        render_right = min(DUNGEON_GEN_W - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
         render_back = max(0, round(self.player.pos.z - half_size / MINIMAP_TILE_SIZE))
-        render_front = min(DUNGEON_H - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
+        render_front = min(DUNGEON_GEN_H - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
 
         # Draw the tiles
         for z in range(render_back, render_front + 1):
@@ -164,7 +164,6 @@ class GameState(State):
                     focused_tile_coord = round(self.player.pos.x) + candidate_dx, round(self.player.pos.z) + candidate_dz
                     if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
                         self.current_floor[focused_tile_coord].typ = TileType.DOOR_OPEN
-                        # TODO: handle door hitboxes for opened doors
                         break
 
     def draw(self, surface: Surface) -> None:
@@ -172,12 +171,13 @@ class GameState(State):
         all_entities = [self.player]
 
         render_left = max(0, round(self.player.pos.x) - RENDER_DISTANCE_X)
-        render_right = min(DUNGEON_W - 1, round(self.player.pos.x) + RENDER_DISTANCE_X)
+        render_right = min(self.current_floor.width - 1, round(self.player.pos.x) + RENDER_DISTANCE_X)
         render_back = max(0, round(self.player.pos.z) - RENDER_DISTANCE_Z)
-        render_front = min(DUNGEON_H - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z + 1)
+        render_front = min(self.current_floor.depth - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z + 1)
 
         # Pick render elements to draw
-        render_elems: list[tuple[tuple[int, int] | Entity, float]] = []
+        render_elems: list[_Render] = []
+        # render_elems: list[tuple[tuple[int, int] | Entity, float]] = []
 
         for z in range(render_back, render_front + 1):
             # Draw tiles first
@@ -186,49 +186,20 @@ class GameState(State):
                 tile = self.current_floor[x, z]
                 t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
 
-                if not (
+                if (
                     tile.typ == TileType.WALL
                     and all(
                         self.current_floor[x + dx, z + dz].typ == TileType.WALL
                         for dx, dz in NEIGHBOURS
-                        if 0 <= x + dx < DUNGEON_W and 0 <= z + dz < DUNGEON_H
+                        if 0 <= x + dx < DUNGEON_GEN_W and 0 <= z + dz < DUNGEON_GEN_H
                     )
                 ):
-                    render_elems.append(((x, z), z + t_hitbox_offset.z + t_hitbox.d / 2 - (1 if tile.typ == TileType.EMPTY else 0)))
+                    continue
 
-        for entity in all_entities:
-            render_elems.append((entity, entity.pos.z + entity.hitbox.d / 2))
-
-        # Sort by depth
-        render_elems.sort(key=lambda elem: elem[1])
-
-        for elem in render_elems:
-            if isinstance(elem[0], Entity):
-                # It's an entity!
-                entity = elem[0]
-                entity_vis_left, entity_vis_top = self._world_to_screen_pos((entity.pos.x - entity.images[entity.facing].width / 2 / TILE_WIDTH, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
-                surface.blit(entity.images[entity.facing], (entity_vis_left, entity_vis_top))
-
-                # Show hitboxes
-                if self.game.diagnostics.enabled:
-                    entity_hit_left, entity_hit_top = self._world_to_screen_pos((entity.pos.x - entity.hitbox.w / 2, entity.pos.y + entity.hitbox.h, entity.pos.z - entity.hitbox.d / 2))
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_TOP, (entity_hit_left, entity_hit_top, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_BOTTOM, (entity_hit_left, entity_hit_top + TILE_HEIGHT * entity.hitbox.h, entity.hitbox.w * TILE_WIDTH, entity.hitbox.d * TILE_DEPTH), width=2)
-                    pg.draw.rect(surface, cols.DIAG_HITBOX_FRONT, (entity_hit_left, entity_hit_top + TILE_DEPTH * entity.hitbox.d, entity.hitbox.w * TILE_WIDTH, entity.hitbox.h * TILE_HEIGHT), width=2)
-
-            else:
-                # It's a tile!
-                x, z = elem[0]
-                tile = self.current_floor[elem[0]]
-                tile_left, tile_top = self._world_to_screen_pos((x - 0.5, 1, z - 0.5))
-
-                if (x, z) == self.current_floor.entrance_pos:
-                    image = self.game.assets.images.entrance
-                elif tile.typ == TileType.WALL:
+                if tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
 
                 elif tile.typ == TileType.DOOR_CLOSED:
-                    surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if tile.facing == Facing.NORTH:
                         image = self.game.assets.images.door_north_flipped if tile.flipped else self.game.assets.images.door_north
                     elif tile.facing == Facing.EAST:
@@ -237,8 +208,8 @@ class GameState(State):
                         image = self.game.assets.images.door_south_flipped if tile.flipped else self.game.assets.images.door_south
                     else:
                         image = self.game.assets.images.door_west
+
                 elif tile.typ == TileType.DOOR_OPEN:
-                    surface.blit(self.game.assets.images.floor, (tile_left, tile_top))
                     if tile.facing == Facing.NORTH:
                         image = self.game.assets.images.door_west if tile.flipped else self.game.assets.images.door_east
                     elif tile.facing == Facing.EAST:
@@ -250,16 +221,34 @@ class GameState(State):
 
                 elif tile.typ == TileType.EMPTY:
                     image = self.game.assets.images.floor
+
                 else:
                     raise ValueError(f"unhandled tile type: '{tile.typ}'")
 
-                surface.blit(image, (tile_left, tile_top))
+                left = x - 0.5
+                top = 1
+                back = z - 0.5
+                priority = z + t_hitbox_offset.z + t_hitbox.d / 2 if tile.typ != TileType.EMPTY else 0
 
-        # Show diagnostics for the four tiles immediately adjacent to the player
-        if self.game.diagnostics.enabled:
-            for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                nx, nz = round(self.player.pos.x) + dx, round(self.player.pos.z) + dz
-                tile_left, tile_top = self._world_to_screen_pos((nx - 0.5, 0, nz - 0.5))
-                pg.draw.rect(surface, cols.DIAG_TILE_NEIGHBOURS, (tile_left, tile_top, TILE_WIDTH, TILE_HEIGHT), width=2)
+                if tile.typ in (TileType.DOOR_CLOSED, TileType.DOOR_OPEN):
+                    # Some tiles, like closed doors, require an extra floor tile to be rendered underneath
+                    render_elems.append(_Render(self.game.assets.images.floor, 0, (left, top, back)))
+
+                render_elems.append(_Render(image, priority, (left, top, back)))
+
+        for entity in all_entities:
+            x = entity.pos.x - entity.hitbox.w / 2
+            y = entity.pos.y + entity.hitbox.h
+            z = entity.pos.z - entity.hitbox.d / 2
+            priority = entity.pos.z + entity.hitbox.d / 2
+
+            render_elems.append(_Render(entity.images[entity.facing], priority, (x, y, z)))
+
+        # Sort by depth
+        render_elems.sort(key=lambda elem: elem.priority)
+
+        for elem in render_elems:
+            left, top = self._world_to_screen_pos(elem.world_pos)
+            surface.blit(elem.surface, (left, top))
 
         self._draw_hud(surface)

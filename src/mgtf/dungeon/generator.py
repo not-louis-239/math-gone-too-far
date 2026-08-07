@@ -35,8 +35,8 @@ from mgtf.dungeon.constants import (
     ROOM_W_MAX,
     MAX_RETRIES,
     HALLWAY_W,
-    DUNGEON_W,
-    DUNGEON_H
+    DUNGEON_GEN_W,
+    DUNGEON_GEN_H
 )
 from mgtf.objects.entity import Facing
 
@@ -320,14 +320,14 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
 def generate_dungeon() -> Dungeon:
     """Make a dungeon, enforcing `MIN_AREA_COEFF`"""
 
-    min_area = DUNGEON_W * DUNGEON_H * MIN_AREA_COEFF
+    min_area = DUNGEON_GEN_W * DUNGEON_GEN_H * MIN_AREA_COEFF
 
     for _ in range(MAX_RETRIES):
-        test_dungeon = _make_dungeon(DUNGEON_W, DUNGEON_H)
+        test_dungeon = _make_dungeon(DUNGEON_GEN_W, DUNGEON_GEN_H)
 
         non_wall = sum(
-            1 for x in range(DUNGEON_W)
-            for y in range(DUNGEON_H)
+            1 for x in range(DUNGEON_GEN_W)
+            for y in range(DUNGEON_GEN_H)
             if test_dungeon[x, y].typ != TileType.WALL
         )
 

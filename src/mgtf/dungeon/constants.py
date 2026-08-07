@@ -17,7 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-DUNGEON_W, DUNGEON_H = 80, 80
+DUNGEON_GEN_W, DUNGEON_GEN_H = 80, 80
 
 MAX_RETRIES = 20
 

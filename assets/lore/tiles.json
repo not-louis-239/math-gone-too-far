@@ -13,7 +13,8 @@
         "opaque": true
     },
     "door_open": {
-        "map_colour": "#8c806c"
+        "map_colour": "#8c806c",
+        "solid": true
     },
     "entrance": {
         "map_colour":"#00ff4c"
