@@ -19,6 +19,7 @@
 
 import random
 from typing import TYPE_CHECKING
+from dataclasses import dataclass
 
 import pygame as pg
 from pygame import Surface, Event
@@ -57,6 +58,13 @@ MINIMAP_LEFT = 20
 MINIMAP_TILE_SIZE = 5
 MINIMAP_SIZE = 150
 MINIMAP_PLAYER_POINTER_SIZE = 2
+
+
+@dataclass
+class _Render:
+    surface: pg.Surface
+    priority: float  # higher = drawn later
+    world_pos: tuple[float, float, float]  # top-left-back corner
 
 
 class GameState(State):

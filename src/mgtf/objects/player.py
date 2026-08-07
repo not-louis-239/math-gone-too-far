@@ -23,7 +23,7 @@ from mgtf.objects.entity import Entity, Facing
 from mgtf.objects.entity import Hitbox
 
 
-PLAYER_HITBOX = Hitbox(38 / 48, 45 / 48, 38 / 48)
+PLAYER_HITBOX = Hitbox(38 / 48, 48 / 48, 38 / 48)
 
 
 class Player(Entity):
