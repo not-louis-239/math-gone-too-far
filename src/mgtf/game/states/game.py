@@ -121,7 +121,14 @@ class GameState(State):
         self.player.pos.x, self.player.pos.z = self.dungeon_levels[1].entrance_pos
 
     def update(self, dt_s: float) -> None:
-        pass
+        # Push the player away if they are inside a wall
+        if not self.current_floor.is_vacant((self.player.pos.x, self.player.pos.z), self.player.hitbox):
+            x, z = round(self.player.pos.x), round(self.player.pos.z)
+            tile = self.current_floor[x, z]
+            tile_x_offset, tile_z_offset = tile.get_hitbox_info()[0].xz
+            tile_x, tile_z = x + tile_x_offset, z + tile_z_offset
+            self.player.pos.move_towards_ip((tile_x, self.player.pos.y, tile_z), -dt_s)  # quick fix
+            print("Non vacancy detected!")
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
         if keys[Controls.MOVE_BACK]:

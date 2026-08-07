@@ -31,9 +31,9 @@ _DOOR_H = 1
 _DOOR_D = 4 / 48
 
 _DOOR_NORTH_HITBOX_INFO = pg.Vector3(0, 0, -0.5 + _DOOR_D / 2), Hitbox(_DOOR_W, _DOOR_H, _DOOR_D)
-_DOOR_EAST_HITBOX_INFO = pg.Vector3(0, 0, 0.5 - _DOOR_D / 2), Hitbox(_DOOR_W, _DOOR_H, _DOOR_D)
-_DOOR_SOUTH_HITBOX_INFO = pg.Vector3(-0.5 + _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
-_DOOR_WEST_HITBOX_INFO = pg.Vector3(0.5 - _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
+_DOOR_EAST_HITBOX_INFO = pg.Vector3(0.5 - _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
+_DOOR_SOUTH_HITBOX_INFO = pg.Vector3(0, 0, 0.5 - _DOOR_D / 2), Hitbox(_DOOR_W, _DOOR_H, _DOOR_D)
+_DOOR_WEST_HITBOX_INFO = pg.Vector3(-0.5 + _DOOR_D / 2, 0, 0), Hitbox(_DOOR_D, _DOOR_H, _DOOR_W)
 
 
 @dataclass(kw_only=True)
@@ -71,9 +71,9 @@ class Tile:
         if self.typ == TileType.DOOR_CLOSED:
             if self.facing == Facing.NORTH:
                 return _DOOR_NORTH_HITBOX_INFO
-            elif self.facing == Facing.SOUTH:
+            elif self.facing == Facing.EAST:
                 return _DOOR_EAST_HITBOX_INFO
-            elif self.facing == Facing.WEST:
+            elif self.facing == Facing.SOUTH:
                 return _DOOR_SOUTH_HITBOX_INFO
             else:
                 return _DOOR_WEST_HITBOX_INFO
