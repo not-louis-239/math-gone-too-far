@@ -31,7 +31,7 @@ from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
 from mgtf.core.lore_loader import TILE_PROPERTIES
-from mgtf.core.utils import get_reduced_alpha_tile
+from mgtf.core.utils import get_reduced_alpha_tile, get_blackened_tile
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
@@ -272,6 +272,11 @@ class GameState(State):
                 if z > self.player.pos.z and player_rect.colliderect(tile_rect) and TILE_PROPERTIES[tile.typ].solid:
                     image = get_reduced_alpha_tile(image)  # the half-alpha version of the tile
 
+                # Get the appropriate brightness for the tile based on radius
+                distance = ((self.player.pos.z - z) ** 2 + (self.player.pos.x - x) ** 2) ** 0.5
+                light_strength = 1 - min(1, distance / self.player.light_radius)
+
+                image = get_blackened_tile(image, 1 - light_strength)
                 render_elems.append(_Render(image, priority, self._world_to_screen_pos((left, top, back))))
 
         for entity in all_entities:

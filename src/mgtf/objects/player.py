@@ -30,6 +30,8 @@ class Player(Entity):
     def __init__(self, pos: tuple[int, int, int], images: dict[Facing, Surface], hitbox: Hitbox) -> None:
         super().__init__(pos, images, hitbox)
         self.speed = 5
+        self.light_radius = 8
+        self.max_light_radius = 8
 
     def reset(self) -> None:
         pass

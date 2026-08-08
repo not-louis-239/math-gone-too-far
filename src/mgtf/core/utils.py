@@ -62,6 +62,15 @@ def get_reduced_alpha_tile(surface: pg.Surface):
     return surface_copy
 
 
+def get_blackened_tile(surface: pg.Surface, factor: float) -> pg.Surface:
+    black_surface = pg.Surface(surface.get_size(), pg.SRCALPHA)
+    black_surface.fill((0, 0, 0))
+    black_surface.set_alpha(int(factor * 255))
+    surface_copy = surface.copy()
+    surface_copy.blit(black_surface)
+    return surface_copy
+
+
 def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
     return (
         int(c1[0] * (1 - t) + c2[0] * t),
