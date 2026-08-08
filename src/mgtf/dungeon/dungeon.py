@@ -90,8 +90,8 @@ class Dungeon:
     def line_of_sight(self, start_pos: tuple[int, int], end_pos: tuple[int, int]) -> bool:
         """Returns `True` if there are no solid tiles between
         `start_pos` and `end_pos`.
-        LOS will be not be blocked regardless of whether `start_pos`
-        or `end_pos` themselves are solid tiles."""
+        LOS will be blocked if `start_pos` is a solid tile, but not if
+        `end_pos` is."""
 
         # Uses an adaptation of Bresenham's line algorithm to check
         # tiles along the way.
@@ -110,7 +110,7 @@ class Dungeon:
         while True:
             if (x1, z1) == end_pos:
                 return True
-            if TILE_PROPERTIES[self[x1, z1].typ].opaque and (x1, z1) != start_pos:
+            if TILE_PROPERTIES[self[x1, z1].typ].opaque:
                 return False
 
             e_times_2 = 2 * error
