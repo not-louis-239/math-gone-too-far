@@ -272,9 +272,7 @@ class GameState(State):
 
         # Sort by depth
         render_elems.sort(key=lambda elem: elem.priority)
-
-        for elem in render_elems:
-            left, top = self._world_to_screen_pos(elem.world_pos)
-            surface.blit(elem.surface, (left, top))
+        blitters = [(elem.surface, self._world_to_screen_pos(elem.world_pos)) for elem in render_elems]
+        surface.blits(blitters)
 
         self._draw_hud(surface)
