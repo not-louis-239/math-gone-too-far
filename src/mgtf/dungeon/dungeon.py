@@ -21,13 +21,13 @@ from collections.abc import Iterator
 from typing import overload
 
 from mgtf.core.lore_loader import TILE_PROPERTIES
-from mgtf.dungeon.tile import Tile, TileType
+from mgtf.dungeon.tile import Tile, TileTypeID
 from mgtf.objects.entity import Hitbox
 
 
 class Dungeon:
     def __init__(self, width: int, depth: int) -> None:
-        self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(depth)]
+        self.tiles: list[list[Tile]] = [[Tile(typ=TileTypeID.WALL) for _ in range(width)] for _ in range(depth)]
 
     @property
     def width(self) -> int:
@@ -82,7 +82,7 @@ class Dungeon:
         `TileType.ENTRANCE` tile. Return a sentinel if no such tile exists."""
         for z in range(self.depth):
             for x in range(self.width):
-                if self[x, z].typ == TileType.ENTRANCE:
+                if self[x, z].typ == TileTypeID.ENTRANCE:
                     return (x, z)
 
         return (-1, -1)

@@ -42,7 +42,7 @@ from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.core.utils import get_blackened_tile, get_reduced_alpha_tile
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.generator import generate_dungeon
-from mgtf.dungeon.tile import TileType
+from mgtf.dungeon.tile import TileTypeID
 from mgtf.objects.entity import Facing
 from mgtf.objects.player import PLAYER_HITBOX, Player
 
@@ -99,9 +99,9 @@ class GameState(State):
                 screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
 
                 if not tile.explored or (
-                    tile.typ == TileType.WALL
+                    tile.typ == TileTypeID.WALL
                     and all(
-                        self.current_floor[x + dx, z + dz].typ == TileType.WALL
+                        self.current_floor[x + dx, z + dz].typ == TileTypeID.WALL
                         for dx, dz in NEIGHBOURS
                         if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
                     )
@@ -186,8 +186,8 @@ class GameState(State):
                 # the player is facing
                 for candidate_dx, candidate_dz in ((0, 0), (dx, dz)):
                     focused_tile_coord = round(self.player.pos.x) + candidate_dx, round(self.player.pos.z) + candidate_dz
-                    if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
-                        self.current_floor[focused_tile_coord].typ = TileType.DOOR_OPEN
+                    if self.current_floor[focused_tile_coord].typ == TileTypeID.DOOR_CLOSED:
+                        self.current_floor[focused_tile_coord].typ = TileTypeID.DOOR_OPEN
                         break
 
     def draw(self, surface: Surface) -> None:
@@ -217,22 +217,22 @@ class GameState(State):
                 t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
 
                 if (
-                    tile.typ == TileType.WALL
+                    tile.typ == TileTypeID.WALL
                     and all(
-                        self.current_floor[x + dx, z + dz].typ == TileType.WALL
+                        self.current_floor[x + dx, z + dz].typ == TileTypeID.WALL
                         for dx, dz in NEIGHBOURS
                         if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
                     )
                 ):
                     continue
 
-                if tile.typ == TileType.ENTRANCE:
+                if tile.typ == TileTypeID.ENTRANCE:
                     image = self.game.assets.images.entrance_flipped if tile.flipped else self.game.assets.images.entrance
 
-                elif tile.typ == TileType.WALL:
+                elif tile.typ == TileTypeID.WALL:
                     image = self.game.assets.images.wall
 
-                elif tile.typ == TileType.DOOR_CLOSED:
+                elif tile.typ == TileTypeID.DOOR_CLOSED:
                     if tile.facing == Facing.NORTH:
                         image = self.game.assets.images.door_north_flipped if tile.flipped else self.game.assets.images.door_north
                     elif tile.facing == Facing.EAST:
@@ -242,7 +242,7 @@ class GameState(State):
                     else:
                         image = self.game.assets.images.door_west
 
-                elif tile.typ == TileType.DOOR_OPEN:
+                elif tile.typ == TileTypeID.DOOR_OPEN:
                     if tile.facing == Facing.NORTH:
                         image = self.game.assets.images.door_west if tile.flipped else self.game.assets.images.door_east
                     elif tile.facing == Facing.EAST:
@@ -252,7 +252,7 @@ class GameState(State):
                     else:
                         image = self.game.assets.images.door_north_flipped if tile.flipped else self.game.assets.images.door_south_flipped
 
-                elif tile.typ == TileType.EMPTY:
+                elif tile.typ == TileTypeID.EMPTY:
                     image = self.game.assets.images.floor
 
                 else:
@@ -261,9 +261,9 @@ class GameState(State):
                 left = x - 0.5
                 top = 1
                 back = z - 0.5
-                priority = z + t_hitbox_offset.z + t_hitbox.d / 2 if tile.typ != TileType.EMPTY else 0
+                priority = z + t_hitbox_offset.z + t_hitbox.d / 2 if tile.typ != TileTypeID.EMPTY else 0
 
-                if tile.typ in (TileType.DOOR_CLOSED, TileType.DOOR_OPEN):
+                if tile.typ in (TileTypeID.DOOR_CLOSED, TileTypeID.DOOR_OPEN):
                     # Some tiles, like closed doors, require an extra floor tile to be rendered underneath
                     render_elems.append(_Render(self.game.assets.images.floor, 0, self._world_to_screen_pos((left, top, back))))
 

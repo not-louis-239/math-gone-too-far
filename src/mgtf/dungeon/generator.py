@@ -37,7 +37,7 @@ from mgtf.dungeon.constants import (
     ROOM_W_MIN,
 )
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.tile import Tile, TileType
+from mgtf.dungeon.tile import Tile, TileTypeID
 from mgtf.objects.entity import Facing
 
 _DIRS = ((1, 0), (0, 1), (-1, 0), (0, -1))
@@ -93,7 +93,7 @@ class _Room:
 def _get_reachable_points(dungeon: Dungeon, start_pos: tuple[int, int]) -> set[tuple[int, int]]:
     dungeon_w, dungeon_h = len(dungeon.tiles[0]), len(dungeon.tiles)
 
-    if not 0 <= start_pos[0] < dungeon_w or not 0 <= start_pos[1] < dungeon_h or dungeon[start_pos[0], start_pos[1]].typ == TileType.WALL:
+    if not 0 <= start_pos[0] < dungeon_w or not 0 <= start_pos[1] < dungeon_h or dungeon[start_pos[0], start_pos[1]].typ == TileTypeID.WALL:
         return set()
 
     reachable: set[tuple[int, int]] = {start_pos}
@@ -102,12 +102,12 @@ def _get_reachable_points(dungeon: Dungeon, start_pos: tuple[int, int]) -> set[t
 
     while to_check:
         cx, cy = to_check.popleft()
-        current_vacant = dungeon[cx, cy].typ != TileType.WALL
+        current_vacant = dungeon[cx, cy].typ != TileTypeID.WALL
 
         neighbours: list[tuple[int, int]] = []
         for dx, dy in _DIRS:
             nx, ny = cx + dx, cy + dy
-            if 0 <= nx < dungeon_w and 0 <= ny < dungeon_h and (nx, ny) not in seen and dungeon[nx, ny].typ != TileType.WALL:
+            if 0 <= nx < dungeon_w and 0 <= ny < dungeon_h and (nx, ny) not in seen and dungeon[nx, ny].typ != TileTypeID.WALL:
                 neighbours.append((nx, ny))
                 if current_vacant:
                     reachable.add((nx, ny))
@@ -155,7 +155,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
     for room in rooms:
         for x in range(room.left, room.left + room.width):
             for y in range(room.top, room.top + room.height):
-                dungeon[x, y].typ = TileType.EMPTY
+                dungeon[x, y].typ = TileTypeID.EMPTY
 
     # For each room, carve a hallway leading from it to the closest other rooms
     # If the vertical positions are similar enough, draw a horizontal line from the first room to the other
@@ -187,7 +187,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                     y = random.randint(closest.top + 1, room.bottom - 1)
 
                 for x in range(room.centre_x, closest.centre_x):
-                    dungeon[x, y].typ = TileType.EMPTY
+                    dungeon[x, y].typ = TileTypeID.EMPTY
             elif (
                 room.right - closest.left >= 2 * HALLWAY_W
                 and closest.right - room.left >= 2 * HALLWAY_W
@@ -202,17 +202,17 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                     x = random.randint(closest.left + 1, room.right - 1)
 
                 for y in range(room.centre_y, closest.centre_y):
-                    dungeon[x, y].typ = TileType.EMPTY
+                    dungeon[x, y].typ = TileTypeID.EMPTY
             elif (
                 (closest.top - room.bottom >= 2 or room.top - closest.bottom >= 2)
                 and (closest.left - room.right >= 2 or room.left - closest.right >= 2)
             ):
                 y_dir = 1 if closest.centre_y > room.centre_y else -1
                 for y in range(room.centre_y, closest.centre_y + y_dir, y_dir):
-                    dungeon[room.centre_x, y].typ = TileType.EMPTY
+                    dungeon[room.centre_x, y].typ = TileTypeID.EMPTY
                 x_dir = 1 if closest.centre_x > room.centre_x else -1
                 for x in range(room.centre_x, closest.centre_x + x_dir, x_dir):
-                    dungeon[x, closest.centre_y].typ = TileType.EMPTY
+                    dungeon[x, closest.centre_y].typ = TileTypeID.EMPTY
 
     # Make doors in the rooms
     for room in rooms:
@@ -222,20 +222,20 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
                 for x in range(room.left, room.left + room.width):
-                    if dungeon[y][x].typ == TileType.EMPTY:
+                    if dungeon[y][x].typ == TileTypeID.EMPTY:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
-                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[0]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[0]].flipped = chance(0.5)
                             dungeon[chain[0]].facing = facing
 
                         elif len(chain) == 2:
-                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[0]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[0]].flipped = True
                             dungeon[chain[0]].facing = facing
 
-                            dungeon[chain[1]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[1]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[1]].facing = facing
 
                         chain.clear()
@@ -246,20 +246,20 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
                 # Generate doors
                 chain: list[tuple[int, int]] = []
                 for y in range(room.top, room.top + room.height):
-                    if dungeon[y][x].typ == TileType.EMPTY:
+                    if dungeon[y][x].typ == TileTypeID.EMPTY:
                         chain.append((x, y))
                     else:
                         if len(chain) == 1:
-                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[0]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[0]].flipped = chance(0.5)
                             dungeon[chain[0]].facing = facing
 
                         elif len(chain) == 2:
-                            dungeon[chain[0]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[0]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[0]].flipped = True
                             dungeon[chain[0]].facing = facing
 
-                            dungeon[chain[1]].typ = TileType.DOOR_CLOSED
+                            dungeon[chain[1]].typ = TileTypeID.DOOR_CLOSED
                             dungeon[chain[1]].facing = facing
 
                         chain.clear()
@@ -297,10 +297,10 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
 
     # Add a row of solid tiles on each side so that the dungeon is sealed off
     for row in final_dungeon:
-        row.insert(0, Tile(typ=TileType.WALL))
-        row.append(Tile(typ=TileType.WALL))
-    final_dungeon.tiles.insert(0, [Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
-    final_dungeon.tiles.append([Tile(typ=TileType.WALL) for _ in range(final_dungeon.width)])
+        row.insert(0, Tile(typ=TileTypeID.WALL))
+        row.append(Tile(typ=TileTypeID.WALL))
+    final_dungeon.tiles.insert(0, [Tile(typ=TileTypeID.WALL) for _ in range(final_dungeon.width)])
+    final_dungeon.tiles.append([Tile(typ=TileTypeID.WALL) for _ in range(final_dungeon.width)])
 
     # Adjust room coordinates to account for padding
     for room in rooms:
@@ -311,7 +311,7 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
     entrance_room = random.choice(rooms)
     entrance_x, entrance_flipped = random.choice(((entrance_room.left, False), (entrance_room.right, True)))
     entrance_z = random.choice((entrance_room.top, entrance_room.bottom))
-    final_dungeon[entrance_x, entrance_z].typ = TileType.ENTRANCE
+    final_dungeon[entrance_x, entrance_z].typ = TileTypeID.ENTRANCE
     final_dungeon[entrance_x, entrance_z].flipped = entrance_flipped
 
     return final_dungeon
@@ -328,7 +328,7 @@ def generate_dungeon() -> Dungeon:
         non_wall = sum(
             1 for x in range(DUNGEON_GEN_W)
             for y in range(DUNGEON_GEN_H)
-            if test_dungeon[x, y].typ != TileType.WALL
+            if test_dungeon[x, y].typ != TileTypeID.WALL
         )
 
         if non_wall >= min_area:

@@ -18,6 +18,7 @@
 
 
 import random
+import math
 from functools import lru_cache
 
 import pygame as pg
@@ -85,3 +86,23 @@ def clamp(val: float, lower: float, upper: float) -> float:
 
 def chance(p: float) -> bool:
     return random.random() < p
+
+
+# TODO: use this for deciding how many item stands to put in a floor,
+# e.g. 2.5 = 50% chance of 2, 50% chance of 3
+def collapse(val: float) -> int:
+    """Stochastically collapse a `float` down to an `int` based
+    on its decimal portion."""
+    val_down = math.floor(val)
+    round_up_chance = val - val_down
+    return val_down + chance(round_up_chance)
+
+
+def _test():
+    collapsed_values = [collapse(3.14159) for _ in range(20)]
+    print(f"Collapsed values for test value collapse(3.14159): {", ".join(str(v) for v in collapsed_values)}")
+    print("You should see mostly 3s with a couple 4s.")
+
+
+if __name__ == "__main__":
+    _test()

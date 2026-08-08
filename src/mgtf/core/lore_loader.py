@@ -18,11 +18,19 @@
 
 
 import json
+from pathlib import Path
 
 from mgtf.core.paths import LORE_DIR
-from mgtf.dungeon.tile import TileProperties, TileType
+from mgtf.dungeon.tile import TileProperties, TileTypeID
+from mgtf.objects.difficulty import DifficultyID, Difficulty
 
-with open(LORE_DIR / "tiles.json") as f:
-    TILE_PROPERTIES: dict[TileType, TileProperties] = {
-        tile_type: TileProperties(**properties) for tile_type, properties in json.load(f).items()
-    }
+
+TILE_PROPERTIES: dict[TileTypeID, TileProperties] = {
+    tile_type: TileProperties(**properties)
+    for tile_type, properties in json.loads((LORE_DIR / "tiles.json").read_text()).items()
+}
+
+DIFFICULTIES: dict[DifficultyID, Difficulty] = {
+    diff_id: Difficulty(**attrs)
+    for diff_id, attrs in json.loads((LORE_DIR / "difficulties.json").read_text()).items()
+}

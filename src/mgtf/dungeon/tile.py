@@ -47,7 +47,7 @@ class TileProperties:
             self.map_colour = (int(map_colour[0:2], 16), int(map_colour[2:4], 16), int(map_colour[4:6], 16))
 
 
-class TileType(StrEnum):
+class TileTypeID(StrEnum):
     # these must match the tile type keys in `assets/lore/tiles.json`
 
     EMPTY = "empty"
@@ -58,7 +58,7 @@ class TileType(StrEnum):
 
 
 class Tile:
-    def __init__(self, typ: TileType) -> None:
+    def __init__(self, typ: TileTypeID) -> None:
         self.typ = typ
         self.explored: bool = False
         self.facing: Facing = Facing.SOUTH
@@ -67,7 +67,7 @@ class Tile:
     def get_hitbox_info(self) -> tuple[pg.Vector3, Hitbox]:
         """Returns (hitbox_offset_from_centre, hitbox)"""
 
-        if self.typ == TileType.DOOR_CLOSED:
+        if self.typ == TileTypeID.DOOR_CLOSED:
             if self.facing == Facing.NORTH:
                 return _DOOR_NORTH_HITBOX_INFO
             elif self.facing == Facing.EAST:
@@ -77,7 +77,7 @@ class Tile:
             else:
                 return _DOOR_WEST_HITBOX_INFO
 
-        elif self.typ == TileType.DOOR_OPEN:
+        elif self.typ == TileTypeID.DOOR_OPEN:
             if self.facing == Facing.NORTH or self.facing == Facing.SOUTH:
                 return _DOOR_WEST_HITBOX_INFO if self.flipped else _DOOR_EAST_HITBOX_INFO
             elif self.facing == Facing.WEST:
