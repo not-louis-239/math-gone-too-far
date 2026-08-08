@@ -55,6 +55,13 @@ def get_text_surf(font: pg.font.Font, text: str, colour: Colour) -> pg.Surface:
     return _get_text_surf(font, text, colour)
 
 
+@lru_cache(maxsize=128)
+def get_reduced_alpha_tile(surface: pg.Surface):
+    surface_copy = surface.copy()
+    surface_copy.set_alpha(128)
+    return surface_copy
+
+
 def lerp_colours(c1: Colour, c2: Colour, t: float) -> Colour:
     return (
         int(c1[0] * (1 - t) + c2[0] * t),

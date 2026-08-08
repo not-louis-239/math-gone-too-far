@@ -31,12 +31,12 @@ from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
 from mgtf.core.lore_loader import TILE_PROPERTIES
+from mgtf.core.utils import get_reduced_alpha_tile
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.constants import DUNGEON_GEN_W, DUNGEON_GEN_H
 from mgtf.objects.player import Player, PLAYER_HITBOX
-from mgtf.objects.entity import Entity
 from mgtf.core.constants import (
     TILE_WIDTH,
     TILE_DEPTH,
@@ -64,7 +64,7 @@ MINIMAP_PLAYER_POINTER_SIZE = 2
 class _Render:
     surface: pg.Surface
     priority: float  # higher = drawn later
-    world_pos: tuple[float, float, float]  # top-left-back corner
+    screen_pos: tuple[float, float]  # top-left-back corner
 
 
 class GameState(State):
@@ -200,7 +200,13 @@ class GameState(State):
 
         # Pick render elements to draw
         render_elems: list[_Render] = []
-        # render_elems: list[tuple[tuple[int, int] | Entity, float]] = []
+
+        player_rect = pg.Rect(
+            SCREEN_CENTRE_X - TILE_WIDTH * PLAYER_HITBOX.w / 2,
+            SCREEN_CENTRE_Z - TILE_HEIGHT * PLAYER_HITBOX.h - TILE_DEPTH * PLAYER_HITBOX.d / 2,
+            TILE_WIDTH * PLAYER_HITBOX.w,
+            TILE_HEIGHT * PLAYER_HITBOX.h + TILE_DEPTH * PLAYER_HITBOX.d
+        )
 
         for z in range(render_back, render_front + 1):
             # Draw tiles first
@@ -258,9 +264,15 @@ class GameState(State):
 
                 if tile.typ in (TileType.DOOR_CLOSED, TileType.DOOR_OPEN):
                     # Some tiles, like closed doors, require an extra floor tile to be rendered underneath
-                    render_elems.append(_Render(self.game.assets.images.floor, 0, (left, top, back)))
+                    render_elems.append(_Render(self.game.assets.images.floor, 0, self._world_to_screen_pos((left, top, back))))
 
-                render_elems.append(_Render(image, priority, (left, top, back)))
+                # Draw the tile at half alpha if it is immediately infront of the player
+                tile_rect = pg.Rect(*self._world_to_screen_pos((left, top, back)), TILE_WIDTH, TILE_HEIGHT + TILE_DEPTH)
+
+                if z > self.player.pos.z and player_rect.colliderect(tile_rect) and TILE_PROPERTIES[tile.typ].solid:
+                    image = get_reduced_alpha_tile(image)  # the half-alpha version of the tile
+
+                render_elems.append(_Render(image, priority, self._world_to_screen_pos((left, top, back))))
 
         for entity in all_entities:
             x = entity.pos.x - entity.hitbox.w / 2
@@ -268,11 +280,11 @@ class GameState(State):
             z = entity.pos.z - entity.hitbox.d / 2
             priority = entity.pos.z + entity.hitbox.d / 2
 
-            render_elems.append(_Render(entity.images[entity.facing], priority, (x, y, z)))
+            render_elems.append(_Render(entity.images[entity.facing], priority, self._world_to_screen_pos((x, y, z))))
 
         # Sort by depth
         render_elems.sort(key=lambda elem: elem.priority)
-        blitters = [(elem.surface, self._world_to_screen_pos(elem.world_pos)) for elem in render_elems]
+        blitters = [(elem.surface, elem.screen_pos) for elem in render_elems]
         surface.blits(blitters)
 
         self._draw_hud(surface)
