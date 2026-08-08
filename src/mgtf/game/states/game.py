@@ -30,12 +30,12 @@ from mgtf.objects.entity import Facing
 from .base import State
 import mgtf.core.colours as cols
 from mgtf.core.controls import Controls
+from mgtf.core.constants import EXPLORED_BRIGHTNESS
 from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.core.utils import get_reduced_alpha_tile, get_blackened_tile
 from mgtf.dungeon.generator import generate_dungeon
 from mgtf.dungeon.tile import TileType
 from mgtf.dungeon.dungeon import Dungeon
-from mgtf.dungeon.constants import DUNGEON_GEN_W, DUNGEON_GEN_H
 from mgtf.objects.player import Player, PLAYER_HITBOX
 from mgtf.core.constants import (
     TILE_WIDTH,
@@ -72,7 +72,7 @@ class GameState(State):
         super().__init__(game)
 
         self.minimap_surface = pg.Surface((MINIMAP_SIZE, MINIMAP_SIZE))
-        self.player = Player((random.randint(0, DUNGEON_GEN_W), 0, random.randint(0, DUNGEON_GEN_H)), self.game.assets.images.player, PLAYER_HITBOX)
+        self.player = Player((0, 0, 0), self.game.assets.images.player, PLAYER_HITBOX)
         self.floor = 1
 
         self.reset()
@@ -87,9 +87,9 @@ class GameState(State):
 
         # Determine render bounds
         render_left = max(0, round(self.player.pos.x - half_size / MINIMAP_TILE_SIZE))
-        render_right = min(DUNGEON_GEN_W - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
+        render_right = min(self.current_floor.width - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
         render_back = max(0, round(self.player.pos.z - half_size / MINIMAP_TILE_SIZE))
-        render_front = min(DUNGEON_GEN_H - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
+        render_front = min(self.current_floor.depth - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
 
         # Draw the tiles
         for z in range(render_back, render_front + 1):
@@ -97,15 +97,17 @@ class GameState(State):
                 tile = self.current_floor[x, z]
                 screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
 
-                if (
+                if not tile.explored:
+                    colour = cols.MINIMAP_UNEXPLORED
+                elif (
                     tile.typ == TileType.WALL
                     and all(
                         self.current_floor[x + dx, z + dz].typ == TileType.WALL
                         for dx, dz in NEIGHBOURS
-                        if 0 <= x + dx < DUNGEON_GEN_W and 0 <= z + dz < DUNGEON_GEN_H
+                        if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
                     )
                 ):
-                    colour = cols.MINIMAP_SOLID
+                    colour = cols.MINIMAP_UNEXPLORED
                 else:
                     colour = TILE_PROPERTIES[tile.typ].map_colour
 
@@ -220,7 +222,7 @@ class GameState(State):
                     and all(
                         self.current_floor[x + dx, z + dz].typ == TileType.WALL
                         for dx, dz in NEIGHBOURS
-                        if 0 <= x + dx < DUNGEON_GEN_W and 0 <= z + dz < DUNGEON_GEN_H
+                        if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
                     )
                 ):
                     continue
@@ -274,7 +276,15 @@ class GameState(State):
 
                 # Get the appropriate brightness for the tile based on radius
                 distance = ((self.player.pos.z - z) ** 2 + (self.player.pos.x - x) ** 2) ** 0.5
-                light_strength = 1 - min(1, distance / self.player.light_radius)
+                light_strength = (
+                    0 if not self.current_floor.line_of_sight((round(self.player.pos.x), round(self.player.pos.z)), (x, z))
+                    else 1 - min(1, distance / self.player.light_radius)
+                )
+
+                if light_strength > 0:
+                    tile.explored = True
+                if tile.explored:
+                    light_strength = max(light_strength, EXPLORED_BRIGHTNESS)
 
                 image = get_blackened_tile(image, 1 - light_strength)
                 render_elems.append(_Render(image, priority, self._world_to_screen_pos((left, top, back))))

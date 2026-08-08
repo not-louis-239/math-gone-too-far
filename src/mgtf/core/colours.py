@@ -40,7 +40,7 @@ DIAG_HITBOX_BOTTOM: Colour = (255, 0, 255)
 DIAG_TILE_NEIGHBOURS: Colour = (0, 255, 0)
 
 MINIMAP_OOB: Colour = (60, 60, 78)  # out-of-bounds
-MINIMAP_SOLID: Colour = (80, 80, 108)  # solid tiles
+MINIMAP_UNEXPLORED: Colour = (80, 80, 108)  # solid tiles
 
 MINIMAP_BORDER :Colour = (255, 255, 255)
 MINIMAP_PLAYER_POINTER: Colour = (255, 255, 255)
