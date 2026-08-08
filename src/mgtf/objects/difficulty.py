@@ -76,5 +76,5 @@ class Difficulty:
     loot_luck_modifier: float
     jar_loot_tier_modifier: int
 
-    def __gt__(self, other: Difficulty):
-        return self.rank > other.rank
+    def __lt__(self, other: Difficulty):
+        return self.rank < other.rank
