@@ -285,6 +285,6 @@ class GameState(State):
         # Sort by depth
         render_elems.sort(key=lambda elem: elem.priority)
         blitters = [(elem.surface, elem.screen_pos) for elem in render_elems]
-        surface.blits(blitters)
+        surface.fblits(blitters)
 
         self._draw_hud(surface)
