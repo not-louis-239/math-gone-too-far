@@ -17,6 +17,7 @@
         "solid": true
     },
     "entrance": {
-        "map_colour":"#00ff4c"
+        "map_colour":"#00ff4c",
+        "solid": true
     }
 }

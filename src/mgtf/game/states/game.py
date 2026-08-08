@@ -96,7 +96,20 @@ class GameState(State):
             for x in range(render_left, render_right + 1):
                 tile = self.current_floor[x, z]
                 screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
-                pg.draw.rect(self.minimap_surface, TILE_PROPERTIES[tile.typ].map_colour, (screen_x, screen_y, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE))
+
+                if (
+                    tile.typ == TileType.WALL
+                    and all(
+                        self.current_floor[x + dx, z + dz].typ == TileType.WALL
+                        for dx, dz in NEIGHBOURS
+                        if 0 <= x + dx < DUNGEON_GEN_W and 0 <= z + dz < DUNGEON_GEN_H
+                    )
+                ):
+                    colour = cols.MINIMAP_SOLID
+                else:
+                    colour = TILE_PROPERTIES[tile.typ].map_colour
+
+                pg.draw.rect(self.minimap_surface, colour, (screen_x, screen_y, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE))
 
         # Blit the minimap surface onto the main surface
         surface.blit(self.minimap_surface, (MINIMAP_LEFT, MINIMAP_TOP))
@@ -118,7 +131,10 @@ class GameState(State):
     def reset(self) -> None:
         self.dungeon_levels: dict[int, Dungeon] = {1: generate_dungeon()}  # {floor: dungeon}
         self.player.reset()
-        self.player.pos.x, self.player.pos.z = self.dungeon_levels[1].entrance_pos
+
+        entrance_x, entrance_z = self.dungeon_levels[1].get_entrance_pos()
+        entrance_tile = self.current_floor[entrance_x, entrance_z]
+        self.player.pos.x, self.player.pos.z = entrance_x + (-1 if entrance_tile.flipped else 1), entrance_z
 
     def update(self, dt_s: float) -> None:
         # Push the player away if they are inside a wall
@@ -128,7 +144,6 @@ class GameState(State):
             tile_x_offset, tile_z_offset = tile.get_hitbox_info()[0].xz
             tile_x, tile_z = x + tile_x_offset, z + tile_z_offset
             self.player.pos.move_towards_ip((tile_x, self.player.pos.y, tile_z), -dt_s)  # quick fix
-            print("Non vacancy detected!")
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
         if keys[Controls.MOVE_BACK]:
@@ -166,7 +181,8 @@ class GameState(State):
                 elif self.player.facing == Facing.WEST:
                     dx, dz = -1, 0
 
-                # Try to open the current door first, then the
+                # Try to open the current door first, then the one that is just one tile away in the direction
+                # the player is facing
                 for candidate_dx, candidate_dz in ((0, 0), (dx, dz)):
                     focused_tile_coord = round(self.player.pos.x) + candidate_dx, round(self.player.pos.z) + candidate_dz
                     if self.current_floor[focused_tile_coord].typ == TileType.DOOR_CLOSED:
@@ -203,7 +219,10 @@ class GameState(State):
                 ):
                     continue
 
-                if tile.typ == TileType.WALL:
+                if tile.typ == TileType.ENTRANCE:
+                    image = self.game.assets.images.entrance_flipped if tile.flipped else self.game.assets.images.entrance
+
+                elif tile.typ == TileType.WALL:
                     image = self.game.assets.images.wall
 
                 elif tile.typ == TileType.DOOR_CLOSED:

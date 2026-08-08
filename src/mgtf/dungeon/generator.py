@@ -310,9 +310,10 @@ def _make_dungeon(width: int, height: int) -> Dungeon:
 
     # Pick a random room and one of its four corners to be the entrance
     entrance_room = random.choice(rooms)
-    entrance_x = random.choice((entrance_room.left, entrance_room.right))
-    entrance_y = random.choice((entrance_room.top, entrance_room.bottom))
-    final_dungeon.entrance_pos = (entrance_x, entrance_y)
+    entrance_x, entrance_flipped = random.choice(((entrance_room.left, False), (entrance_room.right, True)))
+    entrance_z = random.choice((entrance_room.top, entrance_room.bottom))
+    final_dungeon[entrance_x, entrance_z].typ = TileType.ENTRANCE
+    final_dungeon[entrance_x, entrance_z].flipped = entrance_flipped
 
     return final_dungeon
 

@@ -56,6 +56,7 @@ class TileType(StrEnum):
     WALL = "wall"
     DOOR_CLOSED = "door_closed"
     DOOR_OPEN = "door_open"
+    ENTRANCE = "entrance"
 
 
 class Tile:

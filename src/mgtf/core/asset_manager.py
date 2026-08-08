@@ -51,6 +51,7 @@ class Images:
         self.door_east = load("door_east.png")
         self.door_west = load("door_west.png")
         self.entrance = load("entrance.png")
+        self.entrance_flipped = load("entrance_flipped.png")
 
         # entities
         self.player: dict[Facing, pg.Surface] = {

@@ -27,7 +27,6 @@ from mgtf.objects.entity import Hitbox
 class Dungeon:
     def __init__(self, width: int, depth: int) -> None:
         self.tiles: list[list[Tile]] = [[Tile(typ=TileType.WALL) for _ in range(width)] for _ in range(depth)]
-        self.entrance_pos: tuple[int, int] = (0, 0)
 
     @property
     def width(self) -> int:
@@ -77,3 +76,13 @@ class Dungeon:
                     return False
 
         return True
+
+    def get_entrance_pos(self) -> tuple[int, int]:
+        """Returns the position of the first cell, starting from the top-left, that is a
+        `TileType.ENTRANCE` tile. Return a sentinel if no such tile exists."""
+        for z in range(self.depth):
+            for x in range(self.width):
+                if self[x, z].typ == TileType.ENTRANCE:
+                    return (x, z)
+
+        return (-1, -1)
