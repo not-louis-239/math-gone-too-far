@@ -24,22 +24,21 @@ from collections import deque
 from dataclasses import dataclass
 
 from mgtf.core.utils import chance
+from mgtf.dungeon.constants import (
+    DUNGEON_GEN_H,
+    DUNGEON_GEN_W,
+    HALLWAY_W,
+    MAX_RETRIES,
+    MIN_AREA_COEFF,
+    ROOM_H_MAX,
+    ROOM_H_MIN,
+    ROOM_SPAWN_COEFF,
+    ROOM_W_MAX,
+    ROOM_W_MIN,
+)
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.tile import Tile, TileType
-from mgtf.dungeon.constants import (
-    MIN_AREA_COEFF,
-    ROOM_SPAWN_COEFF,
-    ROOM_H_MIN,
-    ROOM_H_MAX,
-    ROOM_W_MIN,
-    ROOM_W_MAX,
-    MAX_RETRIES,
-    HALLWAY_W,
-    DUNGEON_GEN_W,
-    DUNGEON_GEN_H
-)
 from mgtf.objects.entity import Facing
-
 
 _DIRS = ((1, 0), (0, 1), (-1, 0), (0, -1))
 

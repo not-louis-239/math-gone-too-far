@@ -17,35 +17,36 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import random
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import pygame as pg
-from pygame import Surface, Event
+from pygame import Event, Surface
 from pygame.key import ScancodeWrapper
 
-from mgtf.objects.entity import Facing
-
-from .base import State
 import mgtf.core.colours as cols
-from mgtf.core.controls import Controls
-from mgtf.core.constants import EXPLORED_BRIGHTNESS
-from mgtf.core.lore_loader import TILE_PROPERTIES
-from mgtf.core.utils import get_reduced_alpha_tile, get_blackened_tile
-from mgtf.dungeon.generator import generate_dungeon
-from mgtf.dungeon.tile import TileType
-from mgtf.dungeon.dungeon import Dungeon
-from mgtf.objects.player import Player, PLAYER_HITBOX
 from mgtf.core.constants import (
-    TILE_WIDTH,
-    TILE_DEPTH,
-    TILE_HEIGHT,
+    EXPLORED_BRIGHTNESS,
+    RENDER_DISTANCE_X,
+    RENDER_DISTANCE_Z,
     SCREEN_CENTRE_X,
     SCREEN_CENTRE_Z,
-    RENDER_DISTANCE_X,
-    RENDER_DISTANCE_Z
+    TILE_DEPTH,
+    TILE_HEIGHT,
+    TILE_WIDTH,
 )
+from mgtf.core.controls import Controls
+from mgtf.core.lore_loader import TILE_PROPERTIES
+from mgtf.core.utils import get_blackened_tile, get_reduced_alpha_tile
+from mgtf.dungeon.dungeon import Dungeon
+from mgtf.dungeon.generator import generate_dungeon
+from mgtf.dungeon.tile import TileType
+from mgtf.objects.entity import Facing
+from mgtf.objects.player import PLAYER_HITBOX, Player
+
+from .base import State
 
 if TYPE_CHECKING:
     from mgtf.game.game import Game
@@ -97,9 +98,7 @@ class GameState(State):
                 tile = self.current_floor[x, z]
                 screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
 
-                if not tile.explored:
-                    colour = cols.MINIMAP_UNEXPLORED
-                elif (
+                if not tile.explored or (
                     tile.typ == TileType.WALL
                     and all(
                         self.current_floor[x + dx, z + dz].typ == TileType.WALL

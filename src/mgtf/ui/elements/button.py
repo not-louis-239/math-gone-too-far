@@ -21,11 +21,11 @@ from abc import abstractmethod
 
 import pygame as pg
 
-from .widget import Widget
-
-from mgtf.core.custom_types import Colour
 from mgtf.core.constants import BORDER_W
+from mgtf.core.custom_types import Colour
 from mgtf.core.utils import get_text_surf
+
+from .widget import Widget
 
 
 class _Button(Widget):

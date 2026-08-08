@@ -17,8 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.core.custom_types import Colour, AColour
-
+from mgtf.core.custom_types import AColour, Colour
 
 BG: Colour = (5, 5, 10)
 BG_PANEL: AColour = (0, 0, 0, 150)

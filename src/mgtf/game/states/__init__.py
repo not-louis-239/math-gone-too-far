@@ -19,14 +19,7 @@
 
 from enum import StrEnum
 
-
-from . import (
-    base,
-    title,
-    game,
-    death,
-    win
-)
+from . import base, death, game, title, win
 
 
 class StateID(StrEnum):

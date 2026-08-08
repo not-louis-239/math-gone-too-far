@@ -19,9 +19,10 @@
 
 import pygame as pg
 
-from .widget import Widget
 from mgtf.core.custom_types import Colour
 from mgtf.core.utils import crop_text_to_fit, get_text_surf
+
+from .widget import Widget
 
 
 class Label(Widget):

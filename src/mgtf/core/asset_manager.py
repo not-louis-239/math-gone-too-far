@@ -20,7 +20,7 @@
 
 import pygame as pg
 
-from mgtf.core.paths import FONTS_DIR, IMAGES_DIR, LORE_DIR
+from mgtf.core.paths import FONTS_DIR, IMAGES_DIR
 from mgtf.objects.entity import Facing
 
 

@@ -19,11 +19,10 @@
 
 
 
+from collections.abc import Iterator
 from enum import StrEnum
-from typing import Iterator
 
 import pygame as pg
-
 
 
 class Hitbox:

@@ -17,7 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from typing import overload, Iterator
+from collections.abc import Iterator
+from typing import overload
 
 from mgtf.core.lore_loader import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileType
@@ -49,8 +50,7 @@ class Dungeon:
         self.tiles[key[1]][key[0]] = value
 
     def __iter__(self) -> Iterator[list[Tile]]:
-        for row in self.tiles:
-            yield row
+        yield from self.tiles
 
     def is_vacant(self, pos: tuple[float, float], hitbox: Hitbox) -> bool:
         """Determine, given a `pos` and a `hitbox`, whether `pos` is vacant and does not overlap

@@ -19,7 +19,6 @@
 
 import math
 
-
 FPS = 60
 WN_W, WN_H = 1280, 720
 

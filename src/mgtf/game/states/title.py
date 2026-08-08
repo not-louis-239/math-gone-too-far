@@ -19,8 +19,9 @@
 
 import pygame as pg
 
-from .base import State
 import mgtf.core.colours as cols
+
+from .base import State
 
 
 class TitleState(State):

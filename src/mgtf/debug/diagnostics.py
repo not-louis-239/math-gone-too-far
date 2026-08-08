@@ -17,10 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import time
 import math
-from statistics import mean
+import time
 from dataclasses import dataclass
+from statistics import mean
 
 import pygame as pg
 
@@ -28,7 +28,6 @@ import mgtf.core.colours as cols
 from mgtf.core.asset_manager import Assets
 from mgtf.core.constants import WN_H, WN_W
 from mgtf.core.utils import get_text_surf, lerp_colours
-
 
 GRAPH_HEIGHT_PER_S = 5000
 

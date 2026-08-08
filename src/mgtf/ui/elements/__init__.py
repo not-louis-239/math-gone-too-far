@@ -17,11 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.ui.elements import (
-    spacer,
-    alignment_enums,
-    boxes
-)
+from mgtf.ui.elements import alignment_enums, boxes, spacer
 
 Spacer = spacer.Spacer
 

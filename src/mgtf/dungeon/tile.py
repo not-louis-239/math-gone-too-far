@@ -17,14 +17,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from enum import StrEnum
-
 from dataclasses import dataclass
+from enum import StrEnum
 
 import pygame as pg
 
 from mgtf.objects.entity import Facing, Hitbox
-
 
 _DOOR_W = 1
 _DOOR_H = 1
@@ -80,9 +78,7 @@ class Tile:
                 return _DOOR_WEST_HITBOX_INFO
 
         elif self.typ == TileType.DOOR_OPEN:
-            if self.facing == Facing.NORTH:
-                return _DOOR_WEST_HITBOX_INFO if self.flipped else _DOOR_EAST_HITBOX_INFO
-            elif self.facing == Facing.SOUTH:
+            if self.facing == Facing.NORTH or self.facing == Facing.SOUTH:
                 return _DOOR_WEST_HITBOX_INFO if self.flipped else _DOOR_EAST_HITBOX_INFO
             elif self.facing == Facing.WEST:
                 return _DOOR_NORTH_HITBOX_INFO if self.flipped else _DOOR_SOUTH_HITBOX_INFO

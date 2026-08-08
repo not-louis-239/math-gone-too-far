@@ -27,7 +27,7 @@ import pygame as pg
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 
-from mgtf.core.constants import WN_W, WN_H, FPS
+from mgtf.core.constants import FPS, WN_H, WN_W
 from mgtf.game.game import Game
 
 

@@ -20,8 +20,8 @@
 import pygame as pg
 from pygame import Rect, Surface
 
-from .widget import Widget
 from .alignment_enums import HAlign, VAlign
+from .widget import Widget
 
 
 class _Box(Widget):

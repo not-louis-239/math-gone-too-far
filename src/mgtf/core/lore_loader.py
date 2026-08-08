@@ -19,9 +19,8 @@
 
 import json
 
-from mgtf.dungeon.tile import TileProperties, TileType
 from mgtf.core.paths import LORE_DIR
-
+from mgtf.dungeon.tile import TileProperties, TileType
 
 with open(LORE_DIR / "tiles.json") as f:
     TILE_PROPERTIES: dict[TileType, TileProperties] = {

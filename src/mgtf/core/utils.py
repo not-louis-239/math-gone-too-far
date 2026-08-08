@@ -17,8 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from functools import lru_cache
 import random
+from functools import lru_cache
 
 import pygame as pg
 

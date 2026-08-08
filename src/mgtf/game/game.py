@@ -19,10 +19,10 @@
 
 import pygame as pg
 
-from mgtf.game.states import State, StateID, TitleState, GameState
 from mgtf.core.asset_manager import Assets
-from mgtf.debug.diagnostics import Diagnostics
 from mgtf.core.controls import Controls
+from mgtf.debug.diagnostics import Diagnostics
+from mgtf.game.states import GameState, State, StateID, TitleState
 
 
 class Game:

@@ -19,7 +19,6 @@
 
 import random
 
-
 GLITCH_CHARS = "!@#$%&?£¢§Ø"
 
 
