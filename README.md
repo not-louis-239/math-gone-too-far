@@ -6,6 +6,11 @@
 
 Early development. Features may or may not exist or be incomplete.
 
+## Requirements
+
+- Python 3.x (developed on 3.14.0)
+- See [requirements.txt](./requirements.txt) for further dependencies
+
 ## Licence
 
 The source code in `src/` is licensed under the GNU General Public Licence v3.0. See the [LICENCE](./LICENCE) for the full licence text.

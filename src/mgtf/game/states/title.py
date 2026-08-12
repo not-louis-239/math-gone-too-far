@@ -17,14 +17,51 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import pygame as pg
 
 import mgtf.core.colours as cols
+from mgtf.core.constants import WN_W, WN_H, UI_PADDING
 
 from .base import State
 
+from mgtf.ui.elements import Label, VBox, RectButton, Spacer, HBox
+
+if TYPE_CHECKING:
+    from mgtf.game.game import Game
+
 
 class TitleState(State):
+    def __init__(self, game: Game) -> None:
+        super().__init__(game)
+
+        self.start_button = RectButton(text="Start", font=self.game.assets.fonts.button, inset=UI_PADDING)
+
+        self.display_vbox = VBox(
+            children=[
+                HBox(
+                    children=[
+                        Spacer(flex=1),
+                        Label(text="Math Gone Too Far", font=game.assets.fonts.title, colour=cols.FG_HEADER),
+                        Spacer(flex=1)
+                    ]
+                ),
+                Spacer(flex=1),
+                HBox(
+                    children=[
+                        Spacer(flex=1),
+                        self.start_button,
+                        Spacer(flex=1)
+                    ]
+                )
+            ]
+        )
+
+        self.display_vbox.layout(pg.Rect(UI_PADDING, UI_PADDING, WN_W - 2 * UI_PADDING, WN_H - 2 * UI_PADDING))
+
     def reset(self) -> None:
         pass
 
@@ -36,3 +73,4 @@ class TitleState(State):
 
     def draw(self, surface: pg.Surface) -> None:
         surface.fill(cols.BG)
+        self.display_vbox.draw(surface)

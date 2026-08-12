@@ -179,7 +179,7 @@ class GameState(State):
                     dx, dz = 0, 1
                 elif self.player.facing == Facing.EAST:
                     dx, dz = 1, 0
-                elif self.player.facing == Facing.WEST:
+                else:
                     dx, dz = -1, 0
 
                 # Try to open the current door first, then the one that is just one tile away in the direction

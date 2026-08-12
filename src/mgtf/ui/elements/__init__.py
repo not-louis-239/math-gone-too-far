@@ -17,7 +17,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from mgtf.ui.elements import alignment_enums, boxes, spacer
+from mgtf.ui.elements import alignment_enums, boxes, spacer, label, button
+
 
 Spacer = spacer.Spacer
 
@@ -26,3 +27,7 @@ VAlign = alignment_enums.VAlign
 
 HBox = boxes.HBox
 VBox = boxes.VBox
+
+Label = label.Label
+
+RectButton = button.RectButton

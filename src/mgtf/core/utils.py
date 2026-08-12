@@ -27,7 +27,7 @@ from mgtf.core.custom_types import Colour
 
 
 @lru_cache(maxsize=1024)
-def crop_text_to_fit(font: pg.font.Font, text: str, max_width: int) -> str:
+def crop_text_to_fit(text: str, font: pg.font.Font, max_width: int) -> str:
     if font.size(text)[0] <= max_width:
         return text
 

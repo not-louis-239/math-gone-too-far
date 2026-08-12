@@ -26,8 +26,8 @@ FG: Colour = (190, 190, 255)
 FG_HEADER: Colour = (130, 130, 200)
 FG_BORDER: Colour = (208, 208, 255)
 
-BG_BUTTON_HOVER: Colour = (12, 12, 24)
-FG_BUTTON_HOVER: Colour = (14, 204, 128)
+BG_BUTTON: Colour = (12, 12, 24)
+FG_BUTTON: Colour = (14, 204, 128)
 
 FG_ERROR: Colour = (255, 108, 108)
 FG_WIN: Colour = (255, 210, 0)

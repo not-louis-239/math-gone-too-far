@@ -20,8 +20,9 @@
 import math
 
 FPS = 60
-WN_W, WN_H = 1280, 720
 
+WN_W, WN_H = 1280, 720
+UI_PADDING = 30
 BORDER_W = 2
 
 TILE_WIDTH, TILE_HEIGHT, TILE_DEPTH = 48, 48, 48  # pixels

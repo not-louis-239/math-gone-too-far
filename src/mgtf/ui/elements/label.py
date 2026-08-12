@@ -47,6 +47,7 @@ class Label(Widget):
 
     def layout(self, rect: pg.Rect) -> None:
         self.rect = rect
+        self._cached_surface = self._refresh_text_surface()
 
     def draw(self, surface: pg.Surface) -> None:
         surface.blit(self._cached_surface, self.rect)

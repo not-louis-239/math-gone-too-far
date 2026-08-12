@@ -24,6 +24,7 @@ import pygame as pg
 from mgtf.core.constants import BORDER_W
 from mgtf.core.custom_types import Colour
 from mgtf.core.utils import get_text_surf
+import mgtf.core.colours as cols
 
 from .widget import Widget
 
@@ -32,7 +33,7 @@ class _Button(Widget):
     def __init__(
             self, *, flex: int = 0,
             text: str, font: pg.font.Font, inset: int = 0,
-            col_bg: Colour, col_fg: Colour, col_border: Colour
+            col_bg: Colour = cols.BG_BUTTON, col_fg: Colour = cols.FG_BUTTON, col_border: Colour = cols.FG_BORDER
         ) -> None:
         super().__init__(flex=flex)
         self.text = text
