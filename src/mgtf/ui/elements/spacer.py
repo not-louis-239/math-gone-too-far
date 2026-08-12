@@ -23,7 +23,7 @@ from .widget import Widget
 
 
 class Spacer(Widget):
-    def __init__(self, *, flex: int = 0) -> None:
+    def __init__(self, *, flex: int = 1) -> None:
         super().__init__(flex=flex)
 
     def preferred_size(self) -> tuple[int, int]:

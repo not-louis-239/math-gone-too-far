@@ -20,13 +20,14 @@
 import pygame as pg
 
 from mgtf.core.custom_types import Colour
+import mgtf.core.colours as cols
 from mgtf.core.utils import crop_text_to_fit, get_text_surf
 
 from .widget import Widget
 
 
 class Label(Widget):
-    def __init__(self, *, flex: int = 0, text: str, font: pg.font.Font, colour: Colour) -> None:
+    def __init__(self, *, flex: int = 0, text: str, font: pg.font.Font, colour: Colour = cols.FG) -> None:
         super().__init__(flex=flex)
         self._colour = colour
         self._font = font

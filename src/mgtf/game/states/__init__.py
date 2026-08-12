@@ -17,21 +17,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-from enum import StrEnum
 
-from . import base, death, game, title, win
-
-
-class StateID(StrEnum):
-    TITLE = "TITLE"
-    GAME = "GAME"
-    DEATH = "DEATH"
-    WIN = "WIN"
+from . import base, difficulty, death, game, title, win
 
 
 State = base.State
 
 TitleState = title.TitleState
+DifficultyState = difficulty.DifficultyState
 GameState = game.GameState
 DeathState = death.DeathState
 WinState = win.WinState

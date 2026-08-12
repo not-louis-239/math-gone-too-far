@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 import pygame as pg
@@ -46,3 +47,11 @@ class State(ABC):
     @abstractmethod
     def draw(self, surface: pg.Surface) -> None:
         ...
+
+
+class StateID(StrEnum):
+    TITLE = "TITLE"
+    DIFFICULTY = "DIFFICULTY"
+    GAME = "GAME"
+    DEATH = "DEATH"
+    WIN = "WIN"

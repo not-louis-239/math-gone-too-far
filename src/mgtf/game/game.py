@@ -22,7 +22,8 @@ import pygame as pg
 from mgtf.core.asset_manager import Assets
 from mgtf.core.controls import Controls
 from mgtf.debug.diagnostics import Diagnostics
-from mgtf.game.states import GameState, State, StateID, TitleState
+from mgtf.game.states import GameState, State, TitleState, DifficultyState
+from mgtf.game.states.base import StateID
 
 
 class Game:
@@ -33,8 +34,12 @@ class Game:
         self.state: StateID = StateID.TITLE
         self.states: dict[StateID, State] = {
             StateID.TITLE: TitleState(self),
+            StateID.DIFFICULTY: DifficultyState(self),
             StateID.GAME: GameState(self)
         }
+
+    def set_state(self, state: StateID) -> None:
+        self.state = state
 
     def update(self, dt_s: float) -> None:
         self.states[self.state].update(dt_s)
