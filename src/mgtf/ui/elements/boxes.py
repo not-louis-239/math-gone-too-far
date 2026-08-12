@@ -25,7 +25,7 @@ from .widget import Widget
 
 
 class _Box(Widget):
-    def __init__(self, *, flex: int = 0, children: list[Widget], gap: int = 0) -> None:
+    def __init__(self, *children: Widget, flex: int = 0, gap: int = 0) -> None:
         super().__init__(flex=flex)
         self.children = children
         self.gap = gap
@@ -140,7 +140,7 @@ class SBox(_Box):
             h_align: HAlign = HAlign.CENTRE,
             v_align: VAlign = VAlign.CENTRE
         ) -> None:
-        super().__init__(children=[child])
+        super().__init__(child)
         self.child = child
 
         self.forced_width = forced_width

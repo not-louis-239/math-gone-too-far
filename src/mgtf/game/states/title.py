@@ -41,23 +41,17 @@ class TitleState(State):
         self.start_button = RectButton(text="Start", font=self.game.assets.fonts.button, inset=UI_PADDING)
 
         self.display_vbox = VBox(
-            children=[
-                HBox(
-                    children=[
-                        Spacer(flex=1),
-                        Label(text="Math Gone Too Far", font=game.assets.fonts.title, colour=cols.FG_HEADER),
-                        Spacer(flex=1)
-                    ]
-                ),
+            HBox(
                 Spacer(flex=1),
-                HBox(
-                    children=[
-                        Spacer(flex=1),
-                        self.start_button,
-                        Spacer(flex=1)
-                    ]
-                )
-            ]
+                Label(text="Math Gone Too Far", font=game.assets.fonts.title, colour=cols.FG_HEADER),
+                Spacer(flex=1)
+            ),
+            Spacer(flex=1),
+            HBox(
+                Spacer(flex=1),
+                self.start_button,
+                Spacer(flex=1)
+            )
         )
 
         self.display_vbox.layout(pg.Rect(UI_PADDING, UI_PADDING, WN_W - 2 * UI_PADDING, WN_H - 2 * UI_PADDING))
