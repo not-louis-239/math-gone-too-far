@@ -24,10 +24,14 @@ from functools import lru_cache
 import pygame as pg
 
 from mgtf.core.custom_types import Colour
+from mgtf.core.glitchy_string import GlitchyString
 
 
 @lru_cache(maxsize=1024)
 def crop_text_to_fit(text: str, font: pg.font.Font, max_width: int) -> str:
+    if isinstance(text, GlitchyString):
+        text = text.glitched()
+
     if font.size(text)[0] <= max_width:
         return text
 

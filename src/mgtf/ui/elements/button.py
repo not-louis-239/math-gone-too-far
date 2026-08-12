@@ -23,6 +23,7 @@ import pygame as pg
 
 from mgtf.core.constants import BORDER_W, TEXT_INSET
 from mgtf.core.custom_types import Colour
+from mgtf.core.glitchy_string import GlitchyString
 from mgtf.core.utils import get_text_surf
 import mgtf.core.colours as cols
 
@@ -31,7 +32,7 @@ from .widget import Widget
 
 class _Button(Widget):
     def __init__(
-            self, *, flex: int = 0,
+            self, *, flex: float = 0,
             text: str, font: pg.font.Font, inset: int = TEXT_INSET,
             col_bg: Colour = cols.BG_BUTTON, col_fg: Colour = cols.FG_BUTTON, col_border: Colour = cols.FG_BORDER
         ) -> None:
@@ -63,5 +64,9 @@ class RectButton(_Button):
         pg.draw.rect(surface, self.col_bg, self.rect)
         pg.draw.rect(surface, self.col_border, self.rect, width=BORDER_W)
 
-        text_surf = get_text_surf(self.font, self.text, self.col_fg)
+        if isinstance(self.text, GlitchyString):
+            text_surf = self.font.render(self.text.glitched(), True, self.col_fg)
+        else:
+            text_surf = get_text_surf(self.font, self.text, self.col_fg)
+
         surface.blit(text_surf, text_surf.get_rect(center=self.rect.center))

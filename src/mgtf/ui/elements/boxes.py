@@ -25,7 +25,7 @@ from .widget import Widget
 
 
 class _Box(Widget):
-    def __init__(self, *children: Widget, flex: int = 0, gap: int = 0) -> None:
+    def __init__(self, *children: Widget, flex: float = 0, gap: int = 0) -> None:
         super().__init__(flex=flex)
         self.children = children
         self.gap = gap

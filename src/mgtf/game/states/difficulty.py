@@ -41,10 +41,10 @@ class DifficultyState(State):
         super().__init__(game)
 
         self.difficulty_buttons: dict[RectButton, DifficultyID] = {
-            RectButton(text="Applications", font=self.game.assets.fonts.button): DifficultyID.APPLICATIONS,
-            RectButton(text="Methods", font=self.game.assets.fonts.button): DifficultyID.METHODS,
-            RectButton(text="Specialist", font=self.game.assets.fonts.button): DifficultyID.SPECIALIST,
-            RectButton(text=GlitchyString("ValueError"), font=self.game.assets.fonts.button): DifficultyID.VALUE_ERROR
+            RectButton(flex=0.75, text="Applications", font=self.game.assets.fonts.button): DifficultyID.APPLICATIONS,
+            RectButton(flex=0.75, text="Methods", font=self.game.assets.fonts.button): DifficultyID.METHODS,
+            RectButton(flex=0.75, text="Specialist", font=self.game.assets.fonts.button): DifficultyID.SPECIALIST,
+            RectButton(flex=0.75, text=GlitchyString("ValueError"), font=self.game.assets.fonts.button, col_fg=cols.FG_ERROR): DifficultyID.VALUE_ERROR
         }
 
         self.display_vbox = VBox(

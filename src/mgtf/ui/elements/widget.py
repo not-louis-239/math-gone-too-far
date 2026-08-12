@@ -23,7 +23,7 @@ import pygame as pg
 
 
 class Widget(ABC):
-    def __init__(self, *, flex: int = 0) -> None:
+    def __init__(self, *, flex: float = 0) -> None:
         self.flex = flex
         self.rect = pg.Rect(0, 0, 0, 0)
 

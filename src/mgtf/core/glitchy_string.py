@@ -18,8 +18,9 @@
 
 
 import random
+import string
 
-GLITCH_CHARS = "!@#$%&?£¢§Ø"
+GLITCH_CHARS = string.punctuation + string.digits + string.ascii_letters
 
 
 class GlitchyString(str):
@@ -29,8 +30,11 @@ class GlitchyString(str):
     def __repr__(self) -> str:
         return f"GlitchyString({self._true_value!r})"
 
-    def __str__(self) -> str:
+    def glitched(self) -> str:
         return "".join(random.choice(GLITCH_CHARS) for _ in self._true_value)
+
+    def __str__(self) -> str:
+        return self.glitched()
 
 
 def _test():
