@@ -38,7 +38,7 @@ from mgtf.core.constants import (
     TILE_WIDTH,
 )
 from mgtf.core.controls import Controls
-from mgtf.core.lore_loader import TILE_PROPERTIES
+from mgtf.lore.loader import TILE_PROPERTIES
 from mgtf.core.utils import get_blackened_tile, get_reduced_alpha_tile
 from mgtf.dungeon.dungeon import Dungeon
 from mgtf.dungeon.generator import generate_dungeon

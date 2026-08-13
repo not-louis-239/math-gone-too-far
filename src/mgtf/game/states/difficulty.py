@@ -30,7 +30,7 @@ from mgtf.core import colours as cols
 from mgtf.core.constants import UI_PADDING, WN_W, WN_H
 from mgtf.core.glitchy_string import GlitchyString
 from mgtf.ui.elements import HBox, VBox, RectButton, Label, Spacer
-from mgtf.objects.difficulty import DifficultyID
+from mgtf.lore.difficulty import DifficultyID
 
 if TYPE_CHECKING:
     from mgtf.game.game import Game

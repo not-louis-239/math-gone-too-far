@@ -20,7 +20,7 @@
 from collections.abc import Iterator
 from typing import overload
 
-from mgtf.core.lore_loader import TILE_PROPERTIES
+from mgtf.lore.loader import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileTypeID
 from mgtf.objects.entity import Hitbox
 

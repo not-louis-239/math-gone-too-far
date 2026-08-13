@@ -49,6 +49,7 @@ class Entity:
         self.pos: pg.Vector3 = pg.Vector3(pos[0], pos[1], pos[2])
         self.facing: Facing = Facing.NORTH
         self.images = images
+
         self._base_hitbox = base_hitbox  # hitbox when facing south
         self._perp_hitbox = Hitbox(base_hitbox.d, base_hitbox.h, base_hitbox.w)
 

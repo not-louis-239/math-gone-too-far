@@ -22,7 +22,7 @@ from pathlib import Path
 
 from mgtf.core.paths import LORE_DIR
 from mgtf.dungeon.tile import TileProperties, TileTypeID
-from mgtf.objects.difficulty import DifficultyID, Difficulty
+from mgtf.lore.difficulty import DifficultyID, Difficulty
 
 
 TILE_PROPERTIES: dict[TileTypeID, TileProperties] = {
