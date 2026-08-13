@@ -23,11 +23,13 @@ from typing import overload
 from mgtf.lore.loader import TILE_PROPERTIES
 from mgtf.dungeon.tile import Tile, TileTypeID
 from mgtf.objects.entity import Hitbox
+from mgtf.objects.entity import Entity
 
 
 class Dungeon:
     def __init__(self, width: int, depth: int) -> None:
         self.tiles: list[list[Tile]] = [[Tile(typ=TileTypeID.WALL) for _ in range(width)] for _ in range(depth)]
+        self.entities: list[Entity] = []
 
     @property
     def width(self) -> int:

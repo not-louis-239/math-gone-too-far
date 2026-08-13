@@ -24,12 +24,17 @@ from mgtf.core.controls import Controls
 from mgtf.debug.diagnostics import Diagnostics
 from mgtf.game.states import GameState, State, TitleState, DifficultyState
 from mgtf.game.states.base import StateID
+from mgtf.objects.environment import Environment
+from mgtf.objects.player import Player, PLAYER_HITBOX
 
 
 class Game:
     def __init__(self) -> None:
         self.assets = Assets()
         self.diagnostics = Diagnostics(self.assets)
+
+        self.env = Environment(self)
+        self.player = Player((0, 0, 0), self.assets.images.player, PLAYER_HITBOX)
 
         self.state: StateID = StateID.TITLE
         self.states: dict[StateID, State] = {

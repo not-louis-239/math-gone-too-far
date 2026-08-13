@@ -18,18 +18,33 @@
 
 
 from pygame import Surface
+from dataclasses import dataclass
 
 from mgtf.objects.entity import Entity, Facing, Hitbox
+from mgtf.lore.difficulty import DifficultyID
+
 
 PLAYER_HITBOX = Hitbox(38 / 48, 48 / 48, 38 / 48)
+
+
+@dataclass
+class PlayerData:
+    difficulty: DifficultyID = DifficultyID.APPLICATIONS
+    light_radius: float = 0
+    max_light_radius: float = 0
+    distance_travelled: float = 0
+    num_wrongs: int = 0
+
+    hp: int = 0
+    max_hp: int = 0
+    floor: int = 1
 
 
 class Player(Entity):
     def __init__(self, pos: tuple[int, int, int], images: dict[Facing, Surface], hitbox: Hitbox) -> None:
         super().__init__(pos, images, hitbox)
         self.speed = 5
-        self.light_radius = 8
-        self.max_light_radius = 8
+        self.data = PlayerData()
 
     def reset(self) -> None:
         pass

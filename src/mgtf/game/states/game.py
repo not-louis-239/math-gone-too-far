@@ -71,39 +71,34 @@ class _Render:
 class GameState(State):
     def __init__(self, game: Game) -> None:
         super().__init__(game)
-
         self.minimap_surface = pg.Surface((MINIMAP_SIZE, MINIMAP_SIZE))
-        self.player = Player((0, 0, 0), self.game.assets.images.player, PLAYER_HITBOX)
-        self.floor = 1
-
-        self.reset()
 
     def _world_to_screen_pos(self, world_pos: tuple[float, float, float] | pg.Vector3) -> tuple[float, float]:
         wx, wy, wz = world_pos
-        return SCREEN_CENTRE_X + (wx - self.player.pos.x) * TILE_WIDTH, SCREEN_CENTRE_Z + (wz - self.player.pos.z) * TILE_DEPTH - (wy - self.player.pos.y) * TILE_HEIGHT
+        return SCREEN_CENTRE_X + (wx - self.game.player.pos.x) * TILE_WIDTH, SCREEN_CENTRE_Z + (wz - self.game.player.pos.z) * TILE_DEPTH - (wy - self.game.player.pos.y) * TILE_HEIGHT
 
     def _draw_minimap(self, surface: pg.Surface) -> None:
         half_size = MINIMAP_SIZE / 2
         self.minimap_surface.fill(cols.MINIMAP_OOB)
 
         # Determine render bounds
-        render_left = max(0, round(self.player.pos.x - half_size / MINIMAP_TILE_SIZE))
-        render_right = min(self.current_floor.width - 1, round(self.player.pos.x + half_size / MINIMAP_TILE_SIZE))
-        render_back = max(0, round(self.player.pos.z - half_size / MINIMAP_TILE_SIZE))
-        render_front = min(self.current_floor.depth - 1, round(self.player.pos.z + half_size / MINIMAP_TILE_SIZE))
+        render_left = max(0, round(self.game.player.pos.x - half_size / MINIMAP_TILE_SIZE))
+        render_right = min(self.game.env.current_floor().width - 1, round(self.game.player.pos.x + half_size / MINIMAP_TILE_SIZE))
+        render_back = max(0, round(self.game.player.pos.z - half_size / MINIMAP_TILE_SIZE))
+        render_front = min(self.game.env.current_floor().depth - 1, round(self.game.player.pos.z + half_size / MINIMAP_TILE_SIZE))
 
         # Draw the tiles
         for z in range(render_back, render_front + 1):
             for x in range(render_left, render_right + 1):
-                tile = self.current_floor[x, z]
-                screen_x, screen_y = half_size + (x - self.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
+                tile = self.game.env.current_floor()[x, z]
+                screen_x, screen_y = half_size + (x - self.game.player.pos.x - 0.5) * MINIMAP_TILE_SIZE, half_size + (z - self.game.player.pos.z - 0.5) * MINIMAP_TILE_SIZE
 
                 if not tile.explored or (
                     tile.typ == TileTypeID.WALL
                     and all(
-                        self.current_floor[x + dx, z + dz].typ == TileTypeID.WALL
+                        self.game.env.current_floor()[x + dx, z + dz].typ == TileTypeID.WALL
                         for dx, dz in NEIGHBOURS
-                        if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
+                        if 0 <= x + dx < self.game.env.current_floor().width and 0 <= z + dz < self.game.env.current_floor().depth
                     )
                 ):
                     colour = cols.MINIMAP_UNEXPLORED
@@ -125,59 +120,47 @@ class GameState(State):
     def _draw_hud(self, surface: Surface) -> None:
         self._draw_minimap(surface)
 
-    @property
-    def current_floor(self) -> Dungeon:
-        return self.dungeon_levels[self.floor]
-
-    def reset(self) -> None:
-        self.dungeon_levels: dict[int, Dungeon] = {1: generate_dungeon()}  # {floor: dungeon}
-        self.player.reset()
-
-        entrance_x, entrance_z = self.dungeon_levels[1].get_entrance_pos()
-        entrance_tile = self.current_floor[entrance_x, entrance_z]
-        self.player.pos.x, self.player.pos.z = entrance_x + (-1 if entrance_tile.flipped else 1), entrance_z
-
     def update(self, dt_s: float) -> None:
         # Push the player away if they are inside a wall
-        if not self.current_floor.is_vacant((self.player.pos.x, self.player.pos.z), self.player.hitbox):
-            x, z = round(self.player.pos.x), round(self.player.pos.z)
-            tile = self.current_floor[x, z]
+        if not self.game.env.current_floor().is_vacant((self.game.player.pos.x, self.game.player.pos.z), self.game.player.hitbox):
+            x, z = round(self.game.player.pos.x), round(self.game.player.pos.z)
+            tile = self.game.env.current_floor()[x, z]
             tile_x_offset, tile_z_offset = tile.get_hitbox_info()[0].xz
             tile_x, tile_z = x + tile_x_offset, z + tile_z_offset
-            self.player.pos.move_towards_ip((tile_x, self.player.pos.y, tile_z), -dt_s)  # quick fix
+            self.game.player.pos.move_towards_ip((tile_x, self.game.player.pos.y, tile_z), -dt_s)  # quick fix
 
     def take_input(self, keys: ScancodeWrapper, events: list[Event], dt_s: float) -> None:
         if keys[Controls.MOVE_BACK]:
-            self.player.facing = Facing.NORTH
-            target_pos = (self.player.pos.x, self.player.pos.z - self.player.speed * dt_s)
-            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
-                self.player.pos.x, self.player.pos.z = target_pos
+            self.game.player.facing = Facing.NORTH
+            target_pos = (self.game.player.pos.x, self.game.player.pos.z - self.game.player.speed * dt_s)
+            if self.game.env.current_floor().is_vacant(target_pos, self.game.player.hitbox):
+                self.game.player.pos.x, self.game.player.pos.z = target_pos
 
         if keys[Controls.MOVE_FWD]:
-            target_pos = (self.player.pos.x, self.player.pos.z + self.player.speed * dt_s)
-            self.player.facing = Facing.SOUTH
-            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
-                self.player.pos.x, self.player.pos.z = target_pos
+            target_pos = (self.game.player.pos.x, self.game.player.pos.z + self.game.player.speed * dt_s)
+            self.game.player.facing = Facing.SOUTH
+            if self.game.env.current_floor().is_vacant(target_pos, self.game.player.hitbox):
+                self.game.player.pos.x, self.game.player.pos.z = target_pos
 
         if keys[Controls.MOVE_LEFT]:
-            self.player.facing = Facing.WEST
-            target_pos = (self.player.pos.x - self.player.speed * dt_s, self.player.pos.z)
-            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
-                self.player.pos.x, self.player.pos.z = target_pos
+            self.game.player.facing = Facing.WEST
+            target_pos = (self.game.player.pos.x - self.game.player.speed * dt_s, self.game.player.pos.z)
+            if self.game.env.current_floor().is_vacant(target_pos, self.game.player.hitbox):
+                self.game.player.pos.x, self.game.player.pos.z = target_pos
 
         if keys[Controls.MOVE_RIGHT]:
-            self.player.facing = Facing.EAST
-            target_pos = (self.player.pos.x + self.player.speed * dt_s, self.player.pos.z)
-            if self.current_floor.is_vacant(target_pos, self.player.hitbox):
-                self.player.pos.x, self.player.pos.z = target_pos
+            self.game.player.facing = Facing.EAST
+            target_pos = (self.game.player.pos.x + self.game.player.speed * dt_s, self.game.player.pos.z)
+            if self.game.env.current_floor().is_vacant(target_pos, self.game.player.hitbox):
+                self.game.player.pos.x, self.game.player.pos.z = target_pos
 
         for event in events:
             if event.type == pg.KEYDOWN and event.key == Controls.INTERACT:
-                if self.player.facing == Facing.NORTH:
+                if self.game.player.facing == Facing.NORTH:
                     dx, dz = 0, -1
-                elif self.player.facing == Facing.SOUTH:
+                elif self.game.player.facing == Facing.SOUTH:
                     dx, dz = 0, 1
-                elif self.player.facing == Facing.EAST:
+                elif self.game.player.facing == Facing.EAST:
                     dx, dz = 1, 0
                 else:
                     dx, dz = -1, 0
@@ -185,19 +168,19 @@ class GameState(State):
                 # Try to open the current door first, then the one that is just one tile away in the direction
                 # the player is facing
                 for candidate_dx, candidate_dz in ((0, 0), (dx, dz)):
-                    focused_tile_coord = round(self.player.pos.x) + candidate_dx, round(self.player.pos.z) + candidate_dz
-                    if self.current_floor[focused_tile_coord].typ == TileTypeID.DOOR_CLOSED:
-                        self.current_floor[focused_tile_coord].typ = TileTypeID.DOOR_OPEN
+                    focused_tile_coord = round(self.game.player.pos.x) + candidate_dx, round(self.game.player.pos.z) + candidate_dz
+                    if self.game.env.current_floor()[focused_tile_coord].typ == TileTypeID.DOOR_CLOSED:
+                        self.game.env.current_floor()[focused_tile_coord].typ = TileTypeID.DOOR_OPEN
                         break
 
     def draw(self, surface: Surface) -> None:
         surface.fill(cols.BG)
-        all_entities = [self.player]
+        all_entities = [self.game.player]
 
-        render_left = max(0, round(self.player.pos.x) - RENDER_DISTANCE_X)
-        render_right = min(self.current_floor.width - 1, round(self.player.pos.x) + RENDER_DISTANCE_X)
-        render_back = max(0, round(self.player.pos.z) - RENDER_DISTANCE_Z)
-        render_front = min(self.current_floor.depth - 1, round(self.player.pos.z) + RENDER_DISTANCE_Z + 1)
+        render_left = max(0, round(self.game.player.pos.x) - RENDER_DISTANCE_X)
+        render_right = min(self.game.env.current_floor().width - 1, round(self.game.player.pos.x) + RENDER_DISTANCE_X)
+        render_back = max(0, round(self.game.player.pos.z) - RENDER_DISTANCE_Z)
+        render_front = min(self.game.env.current_floor().depth - 1, round(self.game.player.pos.z) + RENDER_DISTANCE_Z + 1)
 
         # Pick render elements to draw
         render_elems: list[_Render] = []
@@ -213,15 +196,15 @@ class GameState(State):
             # Draw tiles first
             for x in range(render_left, render_right + 1):
                 # Skip rendering wall tiles that are entirely surrounded by walls
-                tile = self.current_floor[x, z]
+                tile = self.game.env.current_floor()[x, z]
                 t_hitbox_offset, t_hitbox = tile.get_hitbox_info()
 
                 if (
                     tile.typ == TileTypeID.WALL
                     and all(
-                        self.current_floor[x + dx, z + dz].typ == TileTypeID.WALL
+                        self.game.env.current_floor()[x + dx, z + dz].typ == TileTypeID.WALL
                         for dx, dz in NEIGHBOURS
-                        if 0 <= x + dx < self.current_floor.width and 0 <= z + dz < self.current_floor.depth
+                        if 0 <= x + dx < self.game.env.current_floor().width and 0 <= z + dz < self.game.env.current_floor().depth
                     )
                 ):
                     continue
@@ -270,14 +253,14 @@ class GameState(State):
                 # Draw the tile at half alpha if it is immediately infront of the player
                 tile_rect = pg.Rect(*self._world_to_screen_pos((left, top, back)), TILE_WIDTH, TILE_HEIGHT + TILE_DEPTH)
 
-                if z > self.player.pos.z and player_rect.colliderect(tile_rect) and TILE_PROPERTIES[tile.typ].solid:
+                if z > self.game.player.pos.z and player_rect.colliderect(tile_rect) and TILE_PROPERTIES[tile.typ].solid:
                     image = get_reduced_alpha_tile(image)  # the half-alpha version of the tile
 
                 # Get the appropriate brightness for the tile based on radius
-                distance = ((self.player.pos.z - z) ** 2 + (self.player.pos.x - x) ** 2) ** 0.5
+                distance = ((self.game.player.pos.z - z) ** 2 + (self.game.player.pos.x - x) ** 2) ** 0.5
                 light_strength = (
-                    0 if not self.current_floor.line_of_sight((round(self.player.pos.x), round(self.player.pos.z)), (x, z))
-                    else 1 - min(1, distance / self.player.light_radius)
+                    0 if not self.game.env.current_floor().line_of_sight((round(self.game.player.pos.x), round(self.game.player.pos.z)), (x, z))
+                    else 1 - min(1, distance / self.game.player.data.light_radius)
                 )
 
                 if light_strength > 0:
